@@ -374,6 +374,11 @@ export default function App() {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [chatModel, setChatModel] = useState<"gemini" | "nemotron">("nemotron");
 
+  // --- OPENAI KEY VERIFICATION STATE ---
+  const [openaiStatus, setOpenaiStatus] = useState<"idle" | "verifying" | "valid" | "invalid" | "missing" | "error">("idle");
+  const [openaiMessage, setOpenaiMessage] = useState<string>("");
+  const [openaiModelsCount, setOpenaiModelsCount] = useState<number>(0);
+
   // --- WORKSPACE CARDS STATE (Mobile Workspace - 6 Cards) ---
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [cardChecklists, setCardChecklists] = useState<Record<string, string[]>>({
@@ -1002,6 +1007,28 @@ export default function App() {
       }
     } finally {
       setIsSendingChat(false);
+    }
+  };
+
+  // --- OPENAI KEY VERIFICATION ---
+  const handleVerifyOpenAIKey = async () => {
+    setOpenaiStatus("verifying");
+    setOpenaiMessage("Routing validation request to server...");
+    try {
+      const response = await fetch("/api/verify-openai");
+      if (!response.ok) {
+        throw new Error(`Server returned status ${response.status}`);
+      }
+      const data = await response.json();
+      setOpenaiStatus(data.status);
+      setOpenaiMessage(data.message);
+      if (data.modelsCount !== undefined) {
+        setOpenaiModelsCount(data.modelsCount);
+      }
+    } catch (err: any) {
+      console.error("OpenAI verification error:", err);
+      setOpenaiStatus("error");
+      setOpenaiMessage(`Network or connection error: ${err.message || err}`);
     }
   };
 
@@ -2495,6 +2522,68 @@ export default function App() {
                 <span className="text-[10px] bg-slate-900 text-slate-500 border border-slate-850 px-2 py-0.5 rounded font-mono">🐾 Active Protocol</span>
               </div>
             </div>
+
+            {/* OpenAI Key Verification Pipeline (Doctrine-Strict Safeguard) */}
+            <div className="mb-4 p-3 bg-[#080e16] border border-slate-850 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center space-x-1.5">
+                  <span className="text-[10px] bg-slate-950 text-cyan-400 border border-slate-800 px-1.5 py-0.2 rounded font-mono font-bold uppercase">OpenAI Key Verification (Operator Check)</span>
+                  <span className="text-[10px] text-slate-500 font-mono">Ready to Validate</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-normal max-w-xl">
+                  Test the secure status of the OpenAI API key. In line with Pathfinder's sovereign zero-leaking doctrine, this only checks authorization without integrating model endpoints.
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-3 self-stretch sm:self-auto shrink-0">
+                {/* Status Indicator */}
+                {openaiStatus !== "idle" && (
+                  <div className={`text-[11px] font-mono px-2.5 py-1 rounded border flex items-center space-x-1.5 ${
+                    openaiStatus === "verifying" ? "bg-cyan-950/20 border-cyan-800/40 text-cyan-400 animate-pulse" :
+                    openaiStatus === "valid" ? "bg-emerald-950/20 border-emerald-900/40 text-emerald-400" :
+                    openaiStatus === "missing" ? "bg-amber-950/20 border-amber-900/40 text-amber-400" :
+                    openaiStatus === "invalid" ? "bg-rose-950/20 border-rose-900/40 text-rose-400" :
+                    "bg-slate-900 border-slate-800 text-slate-400"
+                  }`} title={openaiMessage}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-current"></span>
+                    <span className="font-semibold uppercase text-[10px]">
+                      {openaiStatus === "verifying" ? "Verifying..." :
+                       openaiStatus === "valid" ? "Key Verified" :
+                       openaiStatus === "missing" ? "No Key Found" :
+                       openaiStatus === "invalid" ? "Invalid Key" :
+                       "System Error"}
+                    </span>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleVerifyOpenAIKey}
+                  disabled={openaiStatus === "verifying"}
+                  className="px-3 py-1.5 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 rounded text-xs font-mono font-medium cursor-pointer flex items-center space-x-1.5 transition-colors disabled:opacity-50"
+                >
+                  {openaiStatus === "verifying" ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                  )}
+                  <span>Verify Status</span>
+                </button>
+              </div>
+            </div>
+
+            {openaiStatus !== "idle" && openaiStatus !== "verifying" && (
+              <div className={`mb-4 px-3 py-2 rounded-lg border text-xs font-mono leading-relaxed animate-fade-in ${
+                openaiStatus === "valid" ? "bg-emerald-950/10 border-emerald-900/20 text-slate-300" :
+                openaiStatus === "missing" ? "bg-amber-950/10 border-amber-900/20 text-amber-300/90" :
+                "bg-rose-950/10 border-rose-900/20 text-rose-300/90"
+              }`}>
+                <div className="font-bold text-[10px] uppercase mb-0.5">
+                  {openaiStatus === "valid" ? "✓ Auth Response" : "✗ Verification Failure"}
+                </div>
+                {openaiMessage}
+              </div>
+            )}
 
             {/* Chat list */}
             <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4">

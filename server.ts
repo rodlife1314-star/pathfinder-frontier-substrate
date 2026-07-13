@@ -213,6 +213,55 @@ app.get("/api/alerts", (req, res) => {
   res.json({ status: "success", data: simulatedAlerts });
 });
 
+// Endpoint to verify OpenAI API Key validity without integrating fully
+app.get("/api/verify-openai", async (req, res) => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey || apiKey.trim() === "" || apiKey === "MY_OPENAI_API_KEY") {
+    return res.json({
+      status: "missing",
+      message: "OpenAI API Key is not configured in the environment. Please configure OPENAI_API_KEY in the Secrets panel."
+    });
+  }
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/models", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const modelsCount = data.data ? data.data.length : 0;
+      return res.json({
+        status: "valid",
+        message: `Successfully verified OpenAI API Key. Accessible models: ${modelsCount}. Ready for future sovereign pipeline integration.`,
+        modelsCount
+      });
+    } else {
+      const errText = await response.text();
+      let parsedErr;
+      try {
+        parsedErr = JSON.parse(errText);
+      } catch (e) {
+        parsedErr = { error: { message: errText } };
+      }
+      return res.json({
+        status: "invalid",
+        message: parsedErr?.error?.message || `Validation failed with status code ${response.status}`,
+        statusCode: response.status
+      });
+    }
+  } catch (err: any) {
+    console.error("OpenAI verification error:", err);
+    return res.json({
+      status: "error",
+      message: `System failed to reach OpenAI validation servers: ${err?.message || err}`
+    });
+  }
+});
+
 // Endpoint to analyze custom portfolio allocations using Gemini or NVIDIA Nemotron
 app.post("/api/analyze-portfolio", async (req, res) => {
   const { allocations, scenario, model } = req.body;
