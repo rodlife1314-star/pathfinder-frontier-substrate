@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Entity Validation Helpers ---
+
+    function isValidPortfolio(data) {
+      return data.keys().hasAll(['userId', 'notional', 'selectedScenario', 'allocation', 'updatedAt'])
+        && data.keys().size() == 5
+        && data.userId == request.auth.uid
+        && data.notional is number
+        && data.selectedScenario in ['efficiency_trap', 'breakout', 'energy_crisis', 'ai_boom']
+        && data.allocation is map
+        && data.updatedAt == request.time;
+    }
+
+    function isValidDeltaJournalEntry(data) {
+      return data.keys().hasAll(['id', 'userId', 'timestamp', 'newsTitle', 'classification', 'sourceText', 'confidenceScore', 'jemmaPassed', 'jemmaResponses', 'notes', 'createdAt'])
+        && data.keys().size() == 11
+        && data.id is string && data.id.size() <= 128
+        && data.userId == request.auth.uid
+        && data.timestamp is string && data.timestamp.size() <= 100
+        && data.newsTitle is string && data.newsTitle.size() <= 300
+        && data.classification in ['Observation', 'Evidence', 'Pattern', 'Model', 'Decision', 'Journal']
+        && data.sourceText is string && data.sourceText.size() <= 2000
+        && data.confidenceScore is number
+        && data.jemmaPassed is bool
+        && data.jemmaResponses is list && data.jemmaResponses.size() <= 20
+        && data.notes is string && data.notes.size() <= 1000
+        && data.createdAt == request.time;
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['id', 'userId', 'sender', 'text', 'timestamp', 'createdAt'])
+        && data.keys().size() == 6
+        && data.id is string && data.id.size() <= 128
+        && data.userId == request.auth.uid
+        && data.sender in ['user', 'alice']
+        && data.text is string && data.text.size() <= 4000
+        && data.timestamp is string && data.timestamp.size() <= 100
+        && data.createdAt == request.time;
+    }
+
+    function isValidCardChecklist(data) {
+      return data.keys().hasAll(['cardId', 'userId', 'items', 'updatedAt'])
+        && data.keys().size() == 4
+        && data.cardId in ['compute', 'infra', 'quantum', 'materials', 'energy', 'government']
+        && data.userId == request.auth.uid
+        && data.items is list && data.items.size() <= 100
+        && data.updatedAt == request.time;
+    }
+
+    // --- Path Rules ---
+
+    match /portfolios/{portfolioId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() && isValidId(portfolioId) && isValidPortfolio(incoming());
+      allow update: if isSignedIn() && isValidId(portfolioId) && isValidPortfolio(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    match /delta_journals/{entryId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() && isValidId(entryId) && isValidDeltaJournalEntry(incoming());
+      allow update: if false; // Append-only
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    match /chat_messages/{messageId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() && isValidId(messageId) && isValidMessage(incoming());
+      allow update: if false; // Append-only
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    match /card_checklists/{checklistId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() && isValidId(checklistId) && isValidCardChecklist(incoming());
+      allow update: if isSignedIn() && isValidId(checklistId) && isValidCardChecklist(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+  }
+}

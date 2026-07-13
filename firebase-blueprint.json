@@ -1,0 +1,153 @@
+{
+  "entities": {
+    "Portfolio": {
+      "title": "Portfolio",
+      "description": "User investment allocation configuration, target scenario, and total notional capital under management.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner user identifier",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "notional": {
+          "type": "number",
+          "description": "Total capital amount in USD"
+        },
+        "selectedScenario": {
+          "type": "string",
+          "enum": ["efficiency_trap", "breakout", "energy_crisis", "ai_boom"]
+        },
+        "allocation": {
+          "type": "object",
+          "description": "Map of ticker symbols to percentage allocation values"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "notional", "selectedScenario", "allocation", "updatedAt"]
+    },
+    "DeltaJournalEntry": {
+      "title": "DeltaJournalEntry",
+      "description": "An append-only strategic review documenting observations, patterns, evidence, and decisions.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "newsTitle": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "classification": {
+          "type": "string",
+          "enum": ["Observation", "Evidence", "Pattern", "Model", "Decision", "Journal"]
+        },
+        "sourceText": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "confidenceScore": {
+          "type": "number"
+        },
+        "jemmaPassed": {
+          "type": "boolean"
+        },
+        "jemmaResponses": {
+          "type": "array"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "userId", "timestamp", "newsTitle", "classification", "sourceText", "confidenceScore", "jemmaPassed", "jemmaResponses", "notes", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A single chat message exchanged with Alice inside the advisory terminal.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sender": {
+          "type": "string",
+          "enum": ["user", "alice"]
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "userId", "sender", "text", "timestamp", "createdAt"]
+    },
+    "CardChecklist": {
+      "title": "CardChecklist",
+      "description": "Sovereign sector cards with structured checklist items for active research.",
+      "type": "object",
+      "properties": {
+        "cardId": {
+          "type": "string",
+          "enum": ["compute", "infra", "quantum", "materials", "energy", "government"]
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "items": {
+          "type": "array"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["cardId", "userId", "items", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/portfolios/{portfolioId}": {
+      "schema": "Portfolio",
+      "description": "User-specific investment configuration."
+    },
+    "/delta_journals/{entryId}": {
+      "schema": "DeltaJournalEntry",
+      "description": "Append-only investment journals."
+    },
+    "/chat_messages/{messageId}": {
+      "schema": "Message",
+      "description": "Advisor dialogue history."
+    },
+    "/card_checklists/{checklistId}": {
+      "schema": "CardChecklist",
+      "description": "Workspace sector checklists."
+    }
+  }
+}

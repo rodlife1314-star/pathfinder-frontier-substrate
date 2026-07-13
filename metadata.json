@@ -1,0 +1,6 @@
+{
+  "name": "Pathfinder: Frontier Substrate",
+  "description": "Sovereign evidence architecture for mapping frontier technology infrastructure through evidence graphs, governance, graph analytics, and operator-led decision making.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

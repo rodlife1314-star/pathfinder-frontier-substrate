@@ -1,0 +1,86 @@
+steps:
+  # =========================================================================
+  # 🐳 SERVICE 1: Wall Street Doctrine (Node.js Frontend/Backend Express)
+  # =========================================================================
+  # Step 1: Build the Node.js application container
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-node-service'
+    args: [
+      'build',
+      '-t', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/wall-street-doctrine:$COMMIT_SHA',
+      '-t', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/wall-street-doctrine:latest',
+      '.'
+    ]
+
+  # Step 2: Push the Node.js application container to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-node-service'
+    args: [
+      'push',
+      '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/wall-street-doctrine',
+      '--all-tags'
+    ]
+
+  # Step 3: Deploy the Node.js applet to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-node-service'
+    entrypoint: 'gcloud'
+    args: [
+      'run', 'deploy', 'wall-street-doctrine',
+      '--image', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/wall-street-doctrine:$COMMIT_SHA',
+      '--region', '$_REGION',
+      '--platform', 'managed',
+      '--allow-unauthenticated',
+      '--service-account', 'wall-street-doctrine-sa@$PROJECT_ID.iam.gserviceaccount.com',
+      '--set-env-vars', 'NODE_ENV=production,RAPIDS_SUBSTRATE_URL=https://rapids-substrate-srv-$PROJECT_ID.a.run.app'
+    ]
+
+  # =========================================================================
+  # 🐍 SERVICE 2: Rapids Substrate (FastAPI Python Core Engine)
+  # =========================================================================
+  # Step 4: Build the Python FastAPI service container
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-python-service'
+    args: [
+      'build',
+      '-t', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/rapids-substrate:$COMMIT_SHA',
+      '-t', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/rapids-substrate:latest',
+      './rapids-substrate'
+    ]
+
+  # Step 5: Push the Python FastAPI service container to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-python-service'
+    args: [
+      'push',
+      '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/rapids-substrate',
+      '--all-tags'
+    ]
+
+  # Step 6: Deploy the Python FastAPI service to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-python-service'
+    entrypoint: 'gcloud'
+    args: [
+      'run', 'deploy', 'rapids-substrate',
+      '--image', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/rapids-substrate:$COMMIT_SHA',
+      '--region', '$_REGION',
+      '--platform', 'managed',
+      '--allow-unauthenticated',
+      '--service-account', 'rapids-substrate-sa@$PROJECT_ID.iam.gserviceaccount.com',
+      # Environment variables injected from Google Secret Manager for production security
+      '--set-env-vars', 'FIREBASE_PROJECT_ID=$PROJECT_ID,GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/sa-key.json',
+      '--set-secrets', 'SQL_DATABASE_URL=sql-db-url-secret:latest'
+    ]
+
+images:
+  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/wall-street-doctrine:$COMMIT_SHA'
+  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/rapids-substrate:$COMMIT_SHA'
+
+substitutions:
+  _REGION: 'europe-west1'
+  _AR_HOSTNAME: 'europe-west1-docker.pkg.dev'
+  _AR_REPO: 'wall-street-doctrine-repo'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
