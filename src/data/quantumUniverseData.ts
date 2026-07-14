@@ -741,14 +741,30 @@ export const QUANTUM_ENTITIES: QuantumEntity[] = [
     company: "IonQ, Inc.",
     primaryRail: "Quantum Hardware",
     secondaryRail: "Cloud / Hyperscalers",
-    reasonForInclusion: "Only pure-play publicly traded trapped-ion quantum computing developer. Trapped-ion qubits have high coherence and natural connectivity.",
-    currentRole: "Deploying IonQ Forte (36 algorithmic qubits) and constructing an enterprise quantum manufacturing facility in Seattle.",
+    reasonForInclusion: "The only pure-play publicly traded trapped-ion quantum developer. Trapped-ion systems do not inherently require sub-millikelvin refrigeration; their physical environment is primarily an ultra-high-vacuum, electromagnetic-control, and optical-stability problem, using low-power lasers for cooling inside localized vacuum chambers.",
+    currentRole: "Operating IonQ Forte (36 algorithmic qubits). Core roadmap targets 256 physical qubits by 2026, with a 10,000 physical qubit engineering waypoint targeted for 2027.",
     confidence: 100,
-    evidenceSources: ["IonQ SEC filings (Form 10-K, 2025/2026)", "IonQ AQ roadmap announcements"],
-    knownDependencies: ["COHR (lasers)", "HPHTY (PMTs for readout)", "LITE (optical modulators)"],
-    spofRelevance: "Trapped-ion pioneer. Main public proxy for the performance and commercial viability of atomic-qubit architectures.",
+    evidenceSources: ["IonQ SEC filings (Form 10-K, 2025/2026)", "IonQ AQ & Physical Qubit Roadmap Announcements", "Trapped-ion physical environment specification sheets"],
+    knownDependencies: ["COHR (lasers)", "HPHTY (PMTs for readout)", "LITE (optical modulators)", "SKYT (proposed vertical-integration foundry rail)"],
+    spofRelevance: "Trapped-ion pioneer. Main public market proxy for the performance, commercial viability, and scalability of atomic-qubit architectures.",
     modalityDependence: "Trapped Ion",
-    isSpeculative: false
+    isSpeculative: false,
+    industrialLayer: 5
+  },
+  {
+    ticker: "SKYT",
+    company: "SkyWater Technology, Inc.",
+    primaryRail: "Semiconductor Fabrication",
+    secondaryRail: "Quantum Hardware",
+    reasonForInclusion: "IonQ's proposed vertical-integration foundry rail. Cooperates on fabricating next-generation trapped-ion chips on silicon, representing a potential domestic hardware manufacturing pathway.",
+    currentRole: "Proposed vertical-integration foundry partner for trapped-ion micro-opto-electromechanical systems (MOEMS) and chip-scale packaging. Not an owned IonQ manufacturing facility.",
+    confidence: 85,
+    evidenceSources: ["IonQ-SkyWater Technology joint development announcements (2025)", "SEC Form 10-K SkyWater commercial agreements"],
+    knownDependencies: ["ASML (lithography tools)", "AMAT (deposition tooling)"],
+    spofRelevance: "Candidate bottleneck for domestic trapped-ion chip scaling. If SkyWater's custom MEMS lines suffer delays, IonQ's transition to silicon-packaged trap chips is postponed.",
+    modalityDependence: "Trapped Ion",
+    isSpeculative: true,
+    industrialLayer: 4
   },
   {
     ticker: "RGTI",
@@ -876,6 +892,7 @@ export const QUANTUM_LINKS = [
   { source: "HPHTY", target: "IONQ", type: "SUPPLIES", isSpeculative: false },
   { source: "HPHTY", target: "HON", type: "SUPPLIES", isSpeculative: false },
   { source: "JNPTF", target: "HON", type: "SUPPLIES", isSpeculative: false },
+  { source: "SKYT", target: "IONQ", type: "SUPPLIES", isSpeculative: true },
 
   // --- Foundries & IP Blocks to Hyperscalers ---
   { source: "TSM", target: "NVDA", type: "SUPPLIES", isSpeculative: false },

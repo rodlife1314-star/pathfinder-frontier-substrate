@@ -9,6 +9,14 @@ export interface TickerInfo {
   category: string;
   allocType: "quantum" | "semis" | "platform" | "materials" | "qubit_play";
   history: number[];
+  
+  // Provenance-bound tracking contracts
+  actualSource?: string;
+  observedAt?: string;
+  ingestedAt?: string;
+  freshness?: "live" | "recent" | "stale" | "unavailable";
+  evidenceState?: "observation" | "calculated" | "inferred";
+  evidenceId?: string;
 }
 
 export interface Alert {
@@ -154,6 +162,7 @@ export interface QuantumEntity {
   isSpeculative: boolean;
   pageRank?: number;
   betweennessCentrality?: number;
+  industrialLayer?: number; // 0 to 6 representing industrial dependency layers
 }
 
 export interface FrontierInfrastructureNode {
@@ -191,7 +200,24 @@ export interface FrontierInfrastructureNode {
     state: "rumoured" | "announced" | "filed" | "shareholder_approved" | "closed" | "trading_live" | "terminated" | "withdrawn" | "delayed";
     expectedClose: string;
   };
+  industrialLayer?: number; // 0 to 6 representing industrial dependency layers
 }
+
+export interface RuntimeSignal {
+  id: string;
+  title: string;
+  summary: string;
+  sourceType: "market" | "regulatory" | "company" | "government" | "research" | "news";
+  sourceName: string;
+  sourceUrl?: string;
+  observedAt: string;
+  ingestedAt: string;
+  freshness: "live" | "recent" | "stale" | "unavailable";
+  evidenceState: "observation" | "verified" | "inferred";
+  evidenceId?: string;
+  affectedEntities: string[];
+}
+
 
 
 

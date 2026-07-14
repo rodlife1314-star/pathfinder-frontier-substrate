@@ -1388,7 +1388,7 @@ export default function App() {
               <h1 className="text-lg font-bold font-display tracking-tight text-white glow-cyan">PATHFINDER DOCTRINE</h1>
               <span className="text-[9px] bg-cyan-950 text-cyan-400 border border-cyan-800/60 px-1.5 py-0.5 rounded font-mono font-bold uppercase">WALL STREET ALPHA</span>
             </div>
-            <p className="text-xs text-slate-400">An evidence architecture where positions are outputs of disciplined systems reasoning, not speculations.</p>
+            <p className="text-xs text-slate-400 font-sans"><span className="text-cyan-400 font-bold font-mono">“Understand reality first. Capital follows.”</span> — A sovereign evidence architecture where positions are outputs of disciplined physical systems reasoning.</p>
           </div>
         </div>
 

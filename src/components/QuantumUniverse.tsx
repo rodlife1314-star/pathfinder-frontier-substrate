@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { 
   QUANTUM_ENTITIES, 
   QUANTUM_LINKS,
@@ -58,6 +58,32 @@ export default function QuantumUniverse() {
   // Ledger export state
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [ledgerFormat, setLedgerFormat] = useState<"json" | "csv" | "import">("json");
+
+  // --- INDUSTRIAL DEPENDENCY LAYERS (0-6) CLASSIFIERS ---
+  const getQuantumIndustrialLayer = useCallback((primaryRail: string, ticker: string): number => {
+    if (["SHECY", "CCJ", "MP"].includes(ticker)) return 0;
+    if (["LIN", "AIQUY"].includes(ticker)) return 1;
+    if (["COHR", "HPHTY", "LITE", "VATYF", "JNPTF", "IPGP"].includes(ticker)) return 2;
+    if (primaryRail === "Photonics / Lasers") return 2;
+    if (["KEYS", "FFR", "OXIGF", "BRKR", "FTV", "EMR", "AITYY"].includes(ticker)) return 3;
+    if (primaryRail === "Test & Measurement" || primaryRail === "Cryogenics") return 3;
+    if (["ASML", "TSM", "GFS", "AMAT", "LRCX", "TOELY", "ENTG", "SKYT"].includes(ticker)) return 4;
+    if (primaryRail === "Semiconductor Fabrication" || primaryRail === "Industrial Automation") return 4;
+    if (["IONQ", "RGTI", "QBTS", "INTC", "HON", "LMT", "NOC", "CEG", "GEV", "NEE", "BWXT", "DELL"].includes(ticker)) return 5;
+    if (primaryRail === "Quantum Hardware" || primaryRail === "Power & Energy" || primaryRail === "Government / Defence Exposure") return 5;
+    return 6;
+  }, []);
+
+  const getFusionIndustrialLayer = useCallback((primaryRail: string, nodeId: string): number => {
+    if (nodeId.includes("shared:SHECY") || nodeId.includes("shared:CCJ") || nodeId.includes("shared:MP")) return 0;
+    if (nodeId.includes("shared:LIN") || nodeId.includes("shared:AIQUY")) return 1;
+    if (primaryRail.includes("HTS materials") || primaryRail.includes("Advanced Materials")) return 1;
+    if (nodeId.includes("shared:VATYF") || primaryRail.includes("vacuum") || primaryRail.includes("Valves") || primaryRail.includes("Vacuum")) return 2;
+    if (primaryRail.includes("Cryogenics") || nodeId.includes("shared:OXIGF") || nodeId.includes("shared:KEYS") || nodeId.includes("shared:BRKR") || primaryRail.includes("Magnet") || primaryRail.includes("winding")) return 3;
+    if (primaryRail.includes("Semiconductor") || primaryRail.includes("Foundry") || primaryRail.includes("Precision industrial manufacturing") || primaryRail.includes("tooling")) return 4;
+    if (primaryRail.includes("Fusion Core") || primaryRail.includes("Fusion Support") || primaryRail.includes("Power and thermal") || primaryRail.includes("Power") || primaryRail.includes("Reactor") || primaryRail.includes("Developer") || primaryRail.includes("fusion:")) return 5;
+    return 6;
+  }, []);
 
   // --- LIVE GRAPH ENGINE (PAGERANK & BETWEENNESS CENTRALITY) ---
   const graphAnalytics = useMemo(() => {
@@ -199,12 +225,16 @@ export default function QuantumUniverse() {
 
   // Merge dynamic centrality scores into entity list
   const entitiesWithScores = useMemo(() => {
-    return QUANTUM_ENTITIES.map(entity => ({
-      ...entity,
-      pageRank: graphAnalytics.pageRank.get(entity.ticker) || 0,
-      betweennessCentrality: graphAnalytics.betweenness.get(entity.ticker) || 0
-    }));
-  }, [graphAnalytics]);
+    return QUANTUM_ENTITIES.map(entity => {
+      const layer = getQuantumIndustrialLayer(entity.primaryRail, entity.ticker);
+      return {
+        ...entity,
+        industrialLayer: layer,
+        pageRank: graphAnalytics.pageRank.get(entity.ticker) || 0,
+        betweennessCentrality: graphAnalytics.betweenness.get(entity.ticker) || 0
+      };
+    });
+  }, [graphAnalytics, getQuantumIndustrialLayer]);
 
   // --- LIVE FUSION GRAPH ENGINE (PAGERANK & BETWEENNESS CENTRALITY) ---
   const fusionGraphAnalytics = useMemo(() => {
@@ -344,12 +374,16 @@ export default function QuantumUniverse() {
   }, []);
 
   const fusionEntitiesWithScores = useMemo(() => {
-    return FUSION_ENTITIES.map(entity => ({
-      ...entity,
-      pageRank: fusionGraphAnalytics.pageRank.get(entity.nodeId) || 0,
-      betweennessCentrality: fusionGraphAnalytics.betweenness.get(entity.nodeId) || 0
-    }));
-  }, [fusionGraphAnalytics]);
+    return FUSION_ENTITIES.map(entity => {
+      const layer = getFusionIndustrialLayer(entity.primaryRail, entity.nodeId);
+      return {
+        ...entity,
+        industrialLayer: layer,
+        pageRank: fusionGraphAnalytics.pageRank.get(entity.nodeId) || 0,
+        betweennessCentrality: fusionGraphAnalytics.betweenness.get(entity.nodeId) || 0
+      };
+    });
+  }, [fusionGraphAnalytics, getFusionIndustrialLayer]);
 
   // --- BRIDGE NODE ANALYSIS ---
   const bridgeNodes = useMemo(() => {
@@ -692,40 +726,46 @@ export default function QuantumUniverse() {
 
   const fusionPipelineColumns = [
     {
-      id: "hts",
-      title: "1. HTS Materials",
-      subtitle: "REBCO conductors & tapes",
-      categories: ["HTS materials and conductor manufacturing"]
+      id: "layer0",
+      title: "L0: Ores & Feedstocks",
+      subtitle: "Lithium, structural alloys, fuel ores",
+      layer: 0
     },
     {
-      id: "magnets",
-      title: "2. Magnet Engineering",
-      subtitle: "Coils, non-planar winding & joints",
-      categories: ["Magnet engineering and winding"]
+      id: "layer1",
+      title: "L1: High-Performance Materials",
+      subtitle: "REBCO tapes, sumitomo conductors",
+      layer: 1
     },
     {
-      id: "vacuum",
-      title: "3. Vacuum Boundaries",
-      subtitle: "Vessels, divertors & first wall",
-      categories: ["Vacuum and plasma-facing boundaries"]
+      id: "layer2",
+      title: "L2: Vacuum & RF Components",
+      subtitle: "Gate valves, high-power microwaves",
+      layer: 2
     },
     {
-      id: "power",
-      title: "4. Power & Thermal Systems",
-      subtitle: "Cryo-cooling & pulsed power",
-      categories: ["Power and thermal systems"]
+      id: "layer3",
+      title: "L3: Cooling & Magnet Systems",
+      subtitle: "HTS coils, non-planar winding, cryo",
+      layer: 3
     },
     {
-      id: "manufacturing",
-      title: "5. Precision Manufacturing",
-      subtitle: "Metrology, tooling, subtractive",
-      categories: ["Precision industrial manufacturing"]
+      id: "layer4",
+      title: "L4: Precision Fabrication & Tools",
+      subtitle: "Vessel machining, divertor tooling",
+      layer: 4
     },
     {
-      id: "computational",
-      title: "6. Computational Engineering",
-      subtitle: "Simulation, digital twins & AI",
-      categories: ["Computational engineering"]
+      id: "layer5",
+      title: "L5: Reactor Cores & Developers",
+      subtitle: "GFUZ MTF, Tokamak confinement systems",
+      layer: 5
+    },
+    {
+      id: "layer6",
+      title: "L6: Controls, Simulations & HPC",
+      subtitle: "Bare-metal GPU solvers, MHD models",
+      layer: 6
     }
   ];
 
@@ -733,10 +773,10 @@ export default function QuantumUniverse() {
     const layout: Record<string, { x: number; y: number; colIndex: number }> = {};
     
     fusionPipelineColumns.forEach((col, colIdx) => {
-      const colNodes = fusionEntitiesWithScores.filter(e => col.categories.includes(e.primaryRail));
+      const colNodes = fusionEntitiesWithScores.filter(e => e.industrialLayer === col.layer);
       
       colNodes.forEach((node, nodeIdx) => {
-        const x = 5 + (colIdx * 17.5);
+        const x = 5 + (colIdx * 14.5);
         const spacing = colNodes.length > 1 ? 85 / (colNodes.length - 1) : 50;
         const y = colNodes.length > 1 ? 8 + (nodeIdx * spacing) : 50;
         
@@ -745,46 +785,52 @@ export default function QuantumUniverse() {
     });
 
     return layout;
-  }, [fusionEntitiesWithScores]);
+  }, [fusionEntitiesWithScores, fusionPipelineColumns]);
 
 
-  // Pipeline layout helper columns mapping
+  // Pipeline layout helper columns mapping using Industrial Layers
   const pipelineColumns = [
     {
-      id: "foundations",
-      title: "1. Physical Foundations",
-      subtitle: "Materials, gases & cooling",
-      categories: ["Advanced Materials", "Cryogenics", "Power & Energy"] as QuantumCategory[]
+      id: "layer0",
+      title: "L0: Raw Materials & Isotopes",
+      subtitle: "Silicon-28, Helium-3, Uranium, Ores",
+      layer: 0
     },
     {
-      id: "manufacturing",
-      title: "2. Fab & Lithography",
-      subtitle: "Silicon & packaging lines",
-      categories: ["Semiconductor Fabrication", "Industrial Automation"] as QuantumCategory[]
+      id: "layer1",
+      title: "L1: Materials & Refining",
+      subtitle: "Superconducting tapes, Purified gases",
+      layer: 1
     },
     {
-      id: "control",
-      title: "3. Control & Optics",
-      subtitle: "T&M, lasers, RF logic",
-      categories: ["Test & Measurement", "Photonics / Lasers"] as QuantumCategory[]
+      id: "layer2",
+      title: "L2: Precision Components & Optics",
+      subtitle: "PMTs, lasers, high-vacuum valves",
+      layer: 2
     },
     {
-      id: "networking",
-      title: "4. Interconnect & Compute",
-      subtitle: "HPC, routing & networks",
-      categories: ["Networking", "Compute", "AI Infrastructure"] as QuantumCategory[]
+      id: "layer3",
+      title: "L3: Subsystems & Waveforms",
+      subtitle: "RF synthesis, Cryo-fridges",
+      layer: 3
     },
     {
-      id: "hardware",
-      title: "5. QPU Processors",
-      subtitle: "Qubits & quantum compilers",
-      categories: ["Quantum Hardware", "Quantum Software"] as QuantumCategory[]
+      id: "layer4",
+      title: "L4: Foundry & Lithography",
+      subtitle: "ASML, TSMC, GFS wafer fabrication",
+      layer: 4
     },
     {
-      id: "delivery",
-      title: "6. Access & Bundling",
-      subtitle: "Hyperscale portals & ETFs",
-      categories: ["Cloud / Hyperscalers", "ETFs / Infrastructure Funds", "Government / Defence Exposure"] as QuantumCategory[]
+      id: "layer5",
+      title: "L5: QPU Hardware Systems",
+      subtitle: "IonQ, Rigetti, Honeywell platforms",
+      layer: 5
+    },
+    {
+      id: "layer6",
+      title: "L6: Cloud, HPC & Software",
+      subtitle: "Azure, AWS, NVDA cuQuantum, Networks",
+      layer: 6
     }
   ];
 
@@ -793,11 +839,11 @@ export default function QuantumUniverse() {
     const layout: Record<string, { x: number; y: number; colIndex: number }> = {};
     
     pipelineColumns.forEach((col, colIdx) => {
-      const colNodes = entitiesWithScores.filter(e => col.categories.includes(e.primaryRail));
+      const colNodes = entitiesWithScores.filter(e => e.industrialLayer === col.layer);
       
       colNodes.forEach((node, nodeIdx) => {
         // Distribute coordinates on a % scale based on column count and node index
-        const x = 5 + (colIdx * 17.5); // X coordinate %
+        const x = 5 + (colIdx * 14.5); // X coordinate %
         const spacing = colNodes.length > 1 ? 85 / (colNodes.length - 1) : 50;
         const y = colNodes.length > 1 ? 8 + (nodeIdx * spacing) : 50; // Y coordinate %
         
@@ -806,7 +852,7 @@ export default function QuantumUniverse() {
     });
 
     return layout;
-  }, [entitiesWithScores]);
+  }, [entitiesWithScores, pipelineColumns]);
 
   // Export templates content
   const exportContent = useMemo(() => {
@@ -2071,7 +2117,7 @@ ${e.evidenceRefs.map(s => `    - "${s}"`).join("\n")}
               <div className="lg:col-span-9 bg-[#04080e] border border-slate-900 rounded-xl p-5 flex flex-col justify-between shadow-xl relative min-h-[580px] overflow-x-auto">
                 
                 {/* Columns Header */}
-                <div className="grid grid-cols-6 gap-2 border-b border-slate-900/70 pb-3 mb-4 min-w-[900px]">
+                <div className="grid gap-2 border-b border-slate-900/70 pb-3 mb-4 min-w-[900px]" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
                   {columns.map((col, idx) => (
                     <div key={idx} className="flex flex-col">
                       <span className="text-[9px] font-mono text-cyan-400 font-bold uppercase tracking-wider">{col.title}</span>

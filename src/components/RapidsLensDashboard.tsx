@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Database,
   Cpu,
@@ -501,6 +501,77 @@ export default function RapidsLensDashboard({
   });
 
   const [rmmHistory, setRmmHistory] = useState<any[]>([]);
+
+  // --- PHOTONIC INTERCONNECT CONTROL PLANE STATES ---
+  const [laserPulseRate, setLaserPulseRate] = useState<number>(50); // MHz
+  const [collectionEfficiency, setCollectionEfficiency] = useState<number>(65); // %
+  const [detectorEfficiency, setDetectorEfficiency] = useState<number>(92); // %
+  const [memoryLifetime, setMemoryLifetime] = useState<number>(100); // ms
+  const [fiberDistance, setFiberDistance] = useState<number>(1.5); // km
+  const [maxRetries, setMaxRetries] = useState<number>(500);
+  const [switchingTopology, setSwitchingTopology] = useState<"MZI Mesh" | "Ring Resonator Crossbar" | "Active Fiber Switch">("MZI Mesh");
+
+  const photonicMetrics = useMemo(() => {
+    const p_coll = collectionEfficiency / 100;
+    const p_det = detectorEfficiency / 100;
+    // Speed of light in fiber is ~200,000 km/s.
+    // Fiber loss coefficient is ~0.2 dB/km at telecommunication wavelengths.
+    const alpha = 0.2; // dB/km
+    const attenuation = Math.pow(10, -(alpha * fiberDistance) / 10);
+    
+    // Joint probability of heralded photon coincidence across two remote stations
+    const p_coincidence = Math.pow(p_coll, 2) * Math.pow(p_det, 2) * attenuation;
+    
+    // Laser pulse frequency in Hz
+    const pulseFreqHz = laserPulseRate * 1e6;
+    
+    // Raw heralded rate in Hz
+    let heraldedRateHz = pulseFreqHz * p_coincidence;
+    
+    // Limit heralded rate by switching latency and topology overhead
+    const topologyOverhead = switchingTopology === "MZI Mesh" ? 1.0 : switchingTopology === "Ring Resonator Crossbar" ? 0.85 : 0.65;
+    heraldedRateHz = heraldedRateHz * topologyOverhead;
+    
+    // Mean time to establish one heralded entanglement link (seconds)
+    const t_herald_sec = heraldedRateHz > 0 ? 1 / heraldedRateHz : Infinity;
+    
+    // Memory decoherence factor: spin-state coherence degrades over time
+    const memLifetimeSec = memoryLifetime / 1000;
+    const intrinsicFidelity = 0.998;
+    
+    // Fidelity formula including quantum memory storage decoherence and dark counts
+    let linkFidelity = intrinsicFidelity * Math.exp(-t_herald_sec / memLifetimeSec);
+    if (isNaN(linkFidelity) || linkFidelity < 0.5) linkFidelity = 0.5;
+    if (linkFidelity > 0.998) linkFidelity = 0.998;
+    
+    // Surfacing to logical compiler state
+    let compilerStatus: "READY" | "DEGRADED" | "CONGESTED" | "STALLED" = "STALLED";
+    let compilerReason = "";
+    
+    if (heraldedRateHz >= 500 && linkFidelity >= 0.95) {
+      compilerStatus = "READY";
+      compilerReason = "High heralded rate and fidelity satisfy logical gate error budgets.";
+    } else if (heraldedRateHz >= 100 && linkFidelity >= 0.90) {
+      compilerStatus = "DEGRADED";
+      compilerReason = "Increased retry overhead due to memory decoherence; logic compiler requires error-mitigation cycles.";
+    } else if (heraldedRateHz > 0 && linkFidelity >= 0.70) {
+      compilerStatus = "CONGESTED";
+      compilerReason = "Link fidelity below threshold. Entanglement distillation queue is congested.";
+    } else {
+      compilerStatus = "STALLED";
+      compilerReason = "Heralded entanglement rate is insufficient to beat local memory coherence decay.";
+    }
+    
+    return {
+      heraldedRateHz,
+      linkFidelity,
+      rttSec: (2 * fiberDistance) / 200000,
+      p_coincidence,
+      t_herald_sec,
+      compilerStatus,
+      compilerReason
+    };
+  }, [laserPulseRate, collectionEfficiency, detectorEfficiency, memoryLifetime, fiberDistance, switchingTopology]);
   const [gpuDetails, setGpuDetails] = useState<any>({
     device: 0,
     name: "NVIDIA H100 PCIe (80GB)",
@@ -3695,6 +3766,289 @@ export default function RapidsLensDashboard({
 
               <div className="text-[10px] text-slate-500 font-mono mt-4 pt-3 border-t border-slate-900">
                 *Selected layer level: L{selectedLayer}. Connected pipeline statuses: HEALTHY.
+              </div>
+            </div>
+          </div>
+
+          {/* Photonic Interconnect Control Plane Audit Panel */}
+          <div className="bg-slate-950 border border-slate-900 rounded-xl p-5 shadow-xl space-y-4 mt-5" id="photonic-interconnect-audit">
+            <div className="border-b border-slate-900 pb-3 flex justify-between items-center flex-wrap gap-2">
+              <div>
+                <span className="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800/60 px-1.5 py-0.5 rounded font-mono font-bold uppercase block w-max mb-1">
+                  SUBSTRATE CONTROL PLANE AUDIT
+                </span>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider font-display">
+                  Photonic Interconnect & Heralded Entanglement Link Router
+                </h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed font-sans mt-0.5">
+                  Quantum computer scaling requires optical routing across cryogenic boundaries. This interface models the physical, optoelectronic, and scheduling control plane governing remote inter-QPU gates.
+                </p>
+              </div>
+              <div className="text-[10px] text-slate-500 font-mono text-right">
+                <span>Model Source: </span>
+                <a href="#" className="text-cyan-400 hover:underline">arXiv:2401.07821</a>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Physics Control Parameters (Column 1) */}
+              <div className="bg-[#03060c] border border-slate-900/60 p-4 rounded-lg space-y-4">
+                <div className="flex items-center space-x-1.5 text-cyan-400 text-xs font-bold font-mono border-b border-slate-900 pb-1.5 mb-2 uppercase">
+                  <span>⚙️ Physical Layer Sliders</span>
+                </div>
+
+                <div className="space-y-3.5">
+                  {/* Laser Pulse Rate */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400 font-mono">Laser Pulse Rate (f_pulse):</span>
+                      <span className="text-cyan-300 font-bold font-mono">{laserPulseRate} MHz</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="10"
+                      max="100"
+                      step="5"
+                      value={laserPulseRate}
+                      onChange={(e) => setLaserPulseRate(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                  </div>
+
+                  {/* Fiber Node Distance */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400 font-mono">Fiber Link Distance (L):</span>
+                      <span className="text-cyan-300 font-bold font-mono">{fiberDistance.toFixed(1)} km</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="10.0"
+                      step="0.1"
+                      value={fiberDistance}
+                      onChange={(e) => setFiberDistance(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                    <div className="flex justify-between text-[8px] text-slate-500 font-mono">
+                      <span>0.1 km (Intra-rack)</span>
+                      <span>10.0 km (Metro)</span>
+                    </div>
+                  </div>
+
+                  {/* Single Photon Collection Efficiency */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400 font-mono">Collection Efficiency (η_coll):</span>
+                      <span className="text-cyan-300 font-bold font-mono">{collectionEfficiency}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="20"
+                      max="95"
+                      step="5"
+                      value={collectionEfficiency}
+                      onChange={(e) => setCollectionEfficiency(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                    <div className="flex justify-between text-[8px] text-slate-500 font-mono">
+                      <span>Low (Waveguide loss)</span>
+                      <span>High (Coupler alignment)</span>
+                    </div>
+                  </div>
+
+                  {/* Photodetector Quantum Efficiency */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400 font-mono">Detector Efficiency (η_det):</span>
+                      <span className="text-cyan-300 font-bold font-mono">{detectorEfficiency}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="50"
+                      max="99"
+                      step="1"
+                      value={detectorEfficiency}
+                      onChange={(e) => setDetectorEfficiency(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                  </div>
+
+                  {/* Memory Coherence Lifetime */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400 font-mono">Memory Spin Lifetime (T2):</span>
+                      <span className="text-cyan-300 font-bold font-mono">{memoryLifetime} ms</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="5"
+                      max="500"
+                      step="5"
+                      value={memoryLifetime}
+                      onChange={(e) => setMemoryLifetime(Number(e.target.value))}
+                      className="w-full h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                    <div className="flex justify-between text-[8px] text-slate-500 font-mono">
+                      <span>5ms (Stray noise)</span>
+                      <span>500ms (Purified spin buffer)</span>
+                    </div>
+                  </div>
+
+                  {/* Switching Topology Dropdown */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] text-slate-400 font-mono block">Switching Topology:</label>
+                    <select
+                      value={switchingTopology}
+                      onChange={(e: any) => setSwitchingTopology(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-800 text-[11px] font-mono rounded px-2.5 py-1.5 text-white focus:outline-none focus:border-cyan-500"
+                    >
+                      <option value="MZI Mesh">Mach-Zehnder (MZI) Mesh [Low loss]</option>
+                      <option value="Ring Resonator Crossbar">Ring Resonator Crossbar [High Q, Narrowband]</option>
+                      <option value="Active Fiber Switch">Active Fiber Switch [Slow mechanical]</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Solved Physical Link Telemetry (Column 2) */}
+              <div className="bg-[#03060c] border border-slate-900/60 p-4 rounded-lg space-y-4">
+                <div className="flex items-center space-x-1.5 text-pink-400 text-xs font-bold font-mono border-b border-slate-900 pb-1.5 mb-2 uppercase">
+                  <span>📊 Derived Interconnect Telemetry</span>
+                </div>
+
+                <div className="space-y-4 font-mono text-[11px]">
+                  {/* Coincidence probability */}
+                  <div className="bg-slate-950 border border-slate-900 p-2.5 rounded">
+                    <div className="text-slate-500 text-[10px]">Coincidence Probability (P_pulse):</div>
+                    <div className="text-sm font-bold text-white mt-0.5">
+                      {photonicMetrics.p_coincidence.toExponential(4)}
+                    </div>
+                    <div className="text-[8.5px] text-slate-500 mt-1 leading-normal">
+                      Joint probability of photon survival & detection per clock cycle.
+                    </div>
+                  </div>
+
+                  {/* Heralded Entanglement Rate */}
+                  <div className="bg-slate-950 border border-slate-900 p-2.5 rounded">
+                    <div className="text-slate-500 text-[10px]">Heralded Link Rate (R_herald):</div>
+                    <div className="text-sm font-bold text-cyan-400 mt-0.5">
+                      {photonicMetrics.heraldedRateHz >= 1000 
+                        ? `${(photonicMetrics.heraldedRateHz / 1000).toFixed(2)} kHz` 
+                        : `${photonicMetrics.heraldedRateHz.toFixed(1)} Hz`}
+                    </div>
+                    <div className="text-[8.5px] text-slate-500 mt-1 leading-normal">
+                      Actual success rate of remote entanglements establishing per second.
+                    </div>
+                  </div>
+
+                  {/* Average Heralding Latency */}
+                  <div className="bg-slate-950 border border-slate-900 p-2.5 rounded">
+                    <div className="text-slate-500 text-[10px]">Mean Heralding Time (t_herald):</div>
+                    <div className="text-sm font-bold text-white mt-0.5">
+                      {photonicMetrics.t_herald_sec === Infinity 
+                        ? "N/A" 
+                        : `${(photonicMetrics.t_herald_sec * 1000).toFixed(2)} ms`}
+                    </div>
+                    <div className="text-[8.5px] text-slate-500 mt-1 leading-normal">
+                      Average latency to generate one Bell pair.
+                    </div>
+                  </div>
+
+                  {/* Bell State Fidelity Gauge */}
+                  <div className="bg-slate-950 border border-slate-900 p-2.5 rounded space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500 text-[10px]">Bell State Fidelity (F_bell):</span>
+                      <span className={`font-bold ${(photonicMetrics.linkFidelity * 100) >= 95 ? "text-emerald-400" : (photonicMetrics.linkFidelity * 100) >= 90 ? "text-amber-400" : "text-rose-500"}`}>
+                        {(photonicMetrics.linkFidelity * 100).toFixed(2)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          (photonicMetrics.linkFidelity * 100) >= 95 
+                            ? "bg-emerald-500" 
+                            : (photonicMetrics.linkFidelity * 100) >= 90 
+                            ? "bg-amber-500" 
+                            : "bg-rose-600"
+                        }`}
+                        style={{ width: `${(photonicMetrics.linkFidelity * 100)}%` }}
+                      />
+                    </div>
+                    <div className="text-[8.5px] text-slate-500 leading-normal">
+                      Entanglement quality as state is stored in memory waiting for compiler dispatch.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Logical Compiler Gate Interface (Column 3) */}
+              <div className="bg-[#03060c] border border-slate-900/60 p-4 rounded-lg flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center space-x-1.5 text-indigo-400 text-xs font-bold font-mono border-b border-slate-900 pb-1.5 mb-2 uppercase">
+                    <span>💻 Logical Compiler Gateway</span>
+                  </div>
+
+                  <div className="space-y-3 font-mono text-[11px]">
+                    {/* Status Badge */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Gateway Status:</span>
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wider ${
+                        photonicMetrics.compilerStatus === "READY" 
+                          ? "bg-emerald-950/80 text-emerald-400 border border-emerald-800/60" 
+                          : photonicMetrics.compilerStatus === "DEGRADED" 
+                          ? "bg-amber-950/80 text-amber-400 border border-amber-800/60"
+                          : "bg-rose-950/80 text-rose-400 border border-rose-800/60"
+                      }`}>
+                        {photonicMetrics.compilerStatus}
+                      </span>
+                    </div>
+
+                    {/* Explanatory text */}
+                    <div className="text-[10px] text-slate-400 leading-relaxed bg-slate-950 border border-slate-900/70 p-2.5 rounded">
+                      <span className="text-slate-500 block text-[9px] font-semibold uppercase mb-0.5">COMPILER REASONING:</span>
+                      {photonicMetrics.compilerReason}
+                    </div>
+
+                    {/* Active Remote-Gate Pipeline Queue */}
+                    <div className="space-y-1.5">
+                      <span className="text-[9.5px] text-slate-500 uppercase block font-semibold">Remote-Gate Instruction Buffer:</span>
+                      <div className="space-y-1 bg-slate-950 p-2 border border-slate-900/70 rounded max-h-[140px] overflow-y-auto">
+                        {[
+                          { inst: "H(q0)", type: "local", latency: "0.1 μs", status: "COMPLETED" },
+                          { inst: "rCX(q0, r_q1)", type: "remote", latency: `${(photonicMetrics.t_herald_sec * 1000).toFixed(1)} ms`, status: photonicMetrics.compilerStatus },
+                          { inst: "rCX(r_q1, q2)", type: "remote", latency: `${(photonicMetrics.t_herald_sec * 1000).toFixed(1)} ms`, status: photonicMetrics.compilerStatus === "READY" ? "READY" : "STALLED" },
+                          { inst: "MEASURE(q0)", type: "local", latency: "0.5 μs", status: "QUEUED" }
+                        ].map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center text-[9px] border-b border-slate-900/40 pb-1 last:border-0 last:pb-0">
+                            <span className={item.type === "remote" ? "text-cyan-400 font-bold" : "text-slate-400"}>
+                              {item.inst}
+                            </span>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-slate-500 text-[8px]">{item.latency}</span>
+                              <span className={`font-bold text-[8px] ${
+                                item.status === "COMPLETED" 
+                                  ? "text-slate-500" 
+                                  : item.status === "READY" || item.status === "READY"
+                                  ? "text-emerald-400"
+                                  : item.status === "DEGRADED"
+                                  ? "text-amber-500"
+                                  : "text-rose-500 animate-pulse"
+                              }`}>
+                                {item.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3.5 border-t border-slate-900 text-[9px] text-slate-500 font-mono">
+                  <span>Hardware Dependencies: </span>
+                  <span className="text-slate-400 font-semibold text-cyan-400">Hamamatsu</span> single-photon detectors, <span className="text-slate-400 font-semibold text-cyan-400">Ciena</span> optoelectronics, <span className="text-slate-400 font-semibold text-cyan-400">Infinera</span> long-haul nodes.
+                </div>
               </div>
             </div>
           </div>
