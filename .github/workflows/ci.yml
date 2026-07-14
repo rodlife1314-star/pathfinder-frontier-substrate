@@ -1,0 +1,31 @@
+name: Pathfinder Sovereign Substrate CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-size: '18'
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Run Linter (TypeScript compilation check)
+        run: npm run lint
+
+      - name: Run Build (Verify production compiler bundle)
+        run: npm run build

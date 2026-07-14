@@ -9,7 +9,7 @@ import { QUANTUM_ENTITIES, QUANTUM_LINKS } from "./src/data/quantumUniverseData.
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -27,7 +27,7 @@ function getGeminiClient() {
       apiKey,
       httpOptions: {
         headers: {
-          'User-Agent': 'aistudio-build',
+          'User-Agent': 'Pathfinder-Frontier-Substrate/2.4.1',
         }
       }
     });
@@ -202,6 +202,17 @@ const simulatedAlerts = [
     impact: "Sovereign adoption curves flattening"
   }
 ];
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || "development",
+    version: "2.4.1"
+  });
+});
 
 // Endpoint to get all tickers data
 app.get("/api/market-data", (req, res) => {

@@ -1315,7 +1315,7 @@ export default function App() {
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2 text-xs font-bold text-cyan-400 mr-2 shrink-0">
             <Activity className="w-3.5 h-3.5 animate-pulse" />
-            <span className="font-display tracking-widest uppercase text-[11px] glow-cyan">Pathfinder Wall Street Doctrine v0.1</span>
+            <span className="font-display tracking-widest uppercase text-[11px] glow-cyan">Pathfinder Frontier Substrate [SIMULATED FEEDS]</span>
           </div>
           <div className="flex items-center space-x-5 text-[11px]">
             {Object.entries(tickers).map(([sym, rawTicker]) => {
@@ -1373,7 +1373,7 @@ export default function App() {
             </>
           )}
           <span className="text-cyan-800">|</span>
-          <span className="text-emerald-500 font-semibold">🐾 ALICE SYSTEM READY</span>
+          <span className="text-amber-400 font-semibold bg-amber-950/20 border border-amber-900/30 px-2 py-0.5 rounded font-mono text-[10px] uppercase">🐾 Alice Protocol Simulator</span>
         </div>
       </div>
 
@@ -1455,17 +1455,25 @@ export default function App() {
         <div className="col-span-12 bg-slate-950/90 border border-slate-800 rounded-xl p-4 shadow-xl relative overflow-hidden" id="global-operating-picture">
           {/* Subtle background glow */}
           <div className="absolute right-0 top-0 w-80 h-32 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+          {/* Doctrine Safety Warning Banner for Simulated/Demonstration Data */}
+          <div className="mb-4 p-3 bg-amber-950/10 border border-amber-900/35 text-amber-400 rounded-lg text-[11px] font-mono leading-normal flex items-start gap-2.5 shadow-sm">
+            <span className="font-bold shrink-0 uppercase bg-amber-900/30 px-1.5 py-0.5 rounded text-[8px] text-amber-200 tracking-wider">Doctrine Status Alert</span>
+            <span className="leading-relaxed">
+              <strong>SIMULATED ENVIRONMENT / DEMONSTRATION DATA</strong> — In strict compliance with Pathfinder's sovereign separation mandate, be advised that the ticker tickers, real-time prices, system signals, alert feeds, and certain confidence metrics are <strong>non-provenance-bound simulation assets</strong> designed to demonstrate operational UX geometry. They are not active market endpoints.
+            </span>
+          </div>
           
           <div className="flex items-center justify-between border-b border-slate-900 pb-3 mb-3">
             <div className="flex items-center space-x-2.5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
               <div>
                 <h2 className="text-xs font-bold text-white uppercase tracking-wider font-display flex items-center gap-2">
-                  <span>Today's Operating Picture</span>
-                  <span className="text-[10px] bg-cyan-950/80 text-cyan-400 border border-cyan-900/40 px-1.5 py-0.5 rounded font-mono font-bold lowercase">v0.2 alpha</span>
+                  <span>Today's Operating Picture (Simulated Sandbox)</span>
+                  <span className="text-[10px] bg-amber-950/50 text-amber-400 border border-amber-900/40 px-1.5 py-0.5 rounded font-mono font-bold lowercase">demonstration v0.2</span>
                 </h2>
                 <p className="text-[10px] text-slate-500 font-mono">Disciplined evidence systems monitoring & verification pipeline</p>
               </div>
@@ -2152,10 +2160,10 @@ export default function App() {
               <div>
                 <div className="flex justify-between items-center border-b border-slate-900 pb-3 mb-4">
                   <div>
-                    <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest font-display">Crystal Bridge</h3>
-                    <p className="text-[11px] text-slate-400">Interactive live knowledge graph. View observations, evidence, and confidence routing.</p>
+                    <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest font-display">Crystal Bridge (Simulated Topology)</h3>
+                    <p className="text-[11px] text-slate-400">Interactive simulated knowledge graph demonstrating causal compute routes and evidence topology.</p>
                   </div>
-                  <span className="text-[10px] bg-slate-900 text-slate-500 border border-slate-850 px-2 py-0.5 rounded font-mono">Living Topology</span>
+                  <span className="text-[10px] bg-amber-950/20 text-amber-400 border border-amber-900/30 px-2 py-0.5 rounded font-mono">Simulated Topology</span>
                 </div>
 
                 {/* SVG Graph Canvas */}
