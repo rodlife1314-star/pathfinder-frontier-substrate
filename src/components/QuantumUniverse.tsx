@@ -52,6 +52,7 @@ export default function QuantumUniverse() {
   // Graph interaction state
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [selectedLink, setSelectedLink] = useState<{ source: string; target: string; type?: string; isSpeculative: boolean } | null>(null);
   const [highlightSpeculative, setHighlightSpeculative] = useState(false);
   const [graphLayout, setGraphLayout] = useState<"pipeline" | "grid">("pipeline");
 
@@ -2215,18 +2216,77 @@ ${e.evidenceRefs.map(s => `    - "${s}"`).join("\n")}
                       const cp2x = x1 + (x2 - x1) * 0.6;
                       const cp2y = y2;
 
+                      const midX = (x1 + x2) / 2;
+                      const midY = (y1 + y2) / 2;
+                      const isLinkSelected = selectedLink && selectedLink.source === link.source && selectedLink.target === link.target;
+
+                      if (isLinkSelected) {
+                        stroke = "#a855f7"; // Purple accent for Epistemology selected edge
+                        strokeWidth = 3;
+                        opacity = 1.0;
+                      }
+
                       return (
-                        <path
-                          key={idx}
-                          d={`M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`}
-                          stroke={stroke}
-                          strokeWidth={strokeWidth}
-                          strokeDasharray={dashArray}
-                          markerEnd={`url(#${markerId})`}
-                          fill="none"
-                          opacity={opacity}
-                          className="transition-all duration-300"
-                        />
+                        <g 
+                          key={idx} 
+                          className="cursor-pointer group"
+                          onClick={() => {
+                            setSelectedNode(null);
+                            setSelectedLink({
+                              source: link.source,
+                              target: link.target,
+                              type: link.type,
+                              isSpeculative: !!link.isSpeculative
+                            });
+                          }}
+                        >
+                          {/* Invisible wider path to make hovering/clicking thin lines effortless */}
+                          <path
+                            d={`M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`}
+                            stroke="transparent"
+                            strokeWidth={10}
+                            fill="none"
+                          />
+                          {/* Visible visual path */}
+                          <path
+                            d={`M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`}
+                            stroke={stroke}
+                            strokeWidth={strokeWidth}
+                            strokeDasharray={dashArray}
+                            markerEnd={`url(#${markerId})`}
+                            fill="none"
+                            opacity={opacity}
+                            className="transition-all duration-300 group-hover:stroke-cyan-400 group-hover:opacity-100"
+                          />
+                          {/* "Pending Corroboration" label for speculative/greyed-out links */}
+                          {(link.isSpeculative || opacity === 0.08 || isLinkSelected) && (
+                            <g className="pointer-events-none">
+                              {/* Background for text legibility */}
+                              <rect
+                                x={midX - 42}
+                                y={midY - 7}
+                                width={84}
+                                height={11}
+                                rx={2}
+                                fill="#030712"
+                                stroke={isLinkSelected ? "#a855f7" : "#334155"}
+                                strokeWidth={0.5}
+                                opacity={isLinkSelected ? 0.9 : 0.6}
+                              />
+                              <text
+                                x={midX}
+                                y={midY + 1}
+                                fill={isLinkSelected ? "#c084fc" : "#94a3b8"}
+                                fontSize="6.5"
+                                fontWeight="bold"
+                                fontFamily="monospace"
+                                textAnchor="middle"
+                              >
+                                Pending Corroboration
+                              </text>
+                            </g>
+                          )}
+                        </g>
                       );
                     })}
                   </svg>
@@ -2283,7 +2343,10 @@ ${e.evidenceRefs.map(s => `    - "${s}"`).join("\n")}
                         key={node.id}
                         onMouseEnter={() => setHoveredNode(node.id)}
                         onMouseLeave={() => setHoveredNode(null)}
-                        onClick={() => setSelectedNode(node.id === selectedNode ? null : node.id)}
+                        onClick={() => {
+                          setSelectedLink(null);
+                          setSelectedNode(node.id === selectedNode ? null : node.id);
+                        }}
                         style={{ 
                           left: `${pos.x}%`, 
                           top: `${pos.y}%`
@@ -2319,6 +2382,99 @@ ${e.evidenceRefs.map(s => `    - "${s}"`).join("\n")}
               {/* Dependency Node Info Sidebar (lg:col-span-3) */}
               <div className="lg:col-span-3 flex flex-col space-y-4">
                 {(() => {
+                  if (selectedLink && !hoveredNode && !selectedNode) {
+                    return (
+                      <div className="bg-slate-950 border border-purple-900/40 p-4 rounded-xl shadow-xl flex-1 flex flex-col justify-between h-full min-h-[580px] overflow-y-auto">
+                        <div className="space-y-4">
+                          <div className="border-b border-slate-900 pb-3">
+                            <span className="text-[9px] bg-purple-950 text-purple-300 border border-purple-900 px-2 py-0.5 rounded font-mono font-bold uppercase tracking-wider block w-max mb-1.5 animate-pulse">
+                              LENS 8 RELATIONSHIP AUDIT
+                            </span>
+                            <h4 className="text-xs font-bold text-white font-display uppercase tracking-wider">
+                              {selectedLink.source} <span className="text-purple-400 font-mono">→</span> {selectedLink.target}
+                            </h4>
+                            <p className="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-wider">
+                              Relationship type: <strong className="text-cyan-400">{selectedLink.type || "DEPENDENCY"}</strong>
+                            </p>
+                          </div>
+
+                          <div className="p-2.5 bg-[#0d0714] rounded-lg border border-purple-950/60">
+                            <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">Epistemic Verification Status</span>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <span className="relative flex h-2 w-2">
+                                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${selectedLink.isSpeculative ? "bg-amber-400 opacity-75" : "bg-emerald-400 opacity-75"}`}></span>
+                                <span className={`relative inline-flex rounded-full h-2 w-2 ${selectedLink.isSpeculative ? "bg-amber-500" : "bg-emerald-500"}`}></span>
+                              </span>
+                              <span className={`text-xs font-mono font-bold uppercase ${selectedLink.isSpeculative ? "text-amber-400" : "text-emerald-400"}`}>
+                                {selectedLink.isSpeculative ? "PENDING CORROBORATION" : "VERIFIED RELATIONSHIP"}
+                              </span>
+                            </div>
+                            <p className="text-[10.5px] text-slate-300 font-sans mt-2 leading-relaxed">
+                              {selectedLink.isSpeculative 
+                                ? "This relationship represents a hypothesized dependency rail. It has been isolated in grey to prevent unverified downstream confidence compounding."
+                                : "This supply channel is fully corroborated across multiple public filings, independent audits, and operator reviews."}
+                            </p>
+                          </div>
+
+                          {selectedLink.isSpeculative && (
+                            <div className="space-y-2">
+                              <span className="text-[9px] text-rose-400 font-mono font-bold uppercase tracking-widest block">
+                                🐾 Missing Promotion Evidence
+                              </span>
+                              <p className="text-[10.5px] text-slate-400 font-sans leading-relaxed">
+                                To promote this relationship from <span className="text-amber-400 font-bold">Pending Corroboration</span> to <span className="text-emerald-400 font-bold">Verified Status</span>, the following physical proofs must be uploaded to the ledger:
+                              </p>
+                              <div className="space-y-1.5 font-mono text-[9px] text-slate-300 leading-relaxed">
+                                <div className="bg-slate-900/60 p-2 rounded border border-slate-850">
+                                  <strong className="text-rose-400 block mb-0.5">1. Supply Verification Manifests</strong>
+                                  Verified supplier chemical vapor deposition (CVD) shipping manifests matching {selectedLink.source} export ports.
+                                </div>
+                                <div className="bg-slate-900/60 p-2 rounded border border-slate-850">
+                                  <strong className="text-rose-400 block mb-0.5">2. Cleanroom Acceptance receipts</strong>
+                                  Confirmed foundry tool acceptance receipts from {selectedLink.target} cleanroom operations.
+                                </div>
+                                <div className="bg-slate-900/60 p-2 rounded border border-slate-850">
+                                  <strong className="text-rose-400 block mb-0.5">3. Cryogenic Telemetry</strong>
+                                  Independent multi-source physical telemetry matching cryogenic liquid helium pressure valves.
+                                </div>
+                                <div className="bg-slate-900/60 p-2 rounded border border-slate-850">
+                                  <strong className="text-rose-400 block mb-0.5">4. Red Team Audit Stamp</strong>
+                                  Formal operator Red Team audit signature and physical verification stamps.
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {!selectedLink.isSpeculative && (
+                            <div className="space-y-2">
+                              <span className="text-[9px] text-emerald-400 font-mono font-bold uppercase tracking-widest block">
+                                Provenance Checkpoints
+                              </span>
+                              <div className="space-y-1 text-slate-300 font-mono text-[10.5px]">
+                                <div className="p-2 bg-slate-900/60 rounded border border-slate-850">
+                                  ✓ SEC 10-K Supply Contract disclosures.
+                                </div>
+                                <div className="p-2 bg-slate-900/60 rounded border border-slate-850">
+                                  ✓ Dual-source independent receipt ledger matches.
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="border-t border-slate-900 pt-3 mt-4 flex justify-between items-center text-[10px] text-slate-500 font-mono">
+                          <button 
+                            onClick={() => setSelectedLink(null)}
+                            className="text-purple-400 hover:text-purple-300 font-bold uppercase"
+                          >
+                            ← Clear Selection
+                          </button>
+                          <span>v1.0.0-alpha</span>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   const node = entities.find((e) => e.id === (hoveredNode || selectedNode));
                   if (!node) {
                     return (
@@ -2388,6 +2544,33 @@ ${e.evidenceRefs.map(s => `    - "${s}"`).join("\n")}
                               </div>
                             ))}
                           </div>
+                        </div>
+
+                        {/* Lens 8 Epistemic Credibility Trace */}
+                        <div className="bg-[#090610]/90 border border-purple-950/80 p-2.5 rounded-lg">
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-[9px] text-purple-400 font-mono font-bold uppercase tracking-widest block">
+                              🐾 Lens 8 Credibility Trace
+                            </span>
+                            <span className="text-[10px] font-mono text-purple-300 font-bold bg-purple-950/80 px-1.5 py-0.5 rounded border border-purple-900/60">
+                              Score: {node.credibilityScore || (node.isSpeculative ? 65 : 95)}%
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 leading-relaxed font-sans">
+                            {node.isSpeculative 
+                              ? "Status: Pending full verification. Isolated in grey to prevent downstream confidence pollution. Requires physical cleanroom receipt matching."
+                              : "Status: Highly Corroborated Knowledge Asset. Verified across regulatory filings and multi-source logistics."}
+                          </p>
+                          {node.credibilityEvidence && node.credibilityEvidence.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              <span className="text-[8px] text-slate-500 font-mono uppercase block">Verification Chain:</span>
+                              {node.credibilityEvidence.map((ev, evIdx) => (
+                                <div key={evIdx} className="text-[9.5px] font-mono text-purple-300 bg-[#120b1c] p-1 rounded border border-purple-950/50">
+                                  ✓ {ev}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
 
                         {/* SPOF Relevance */}

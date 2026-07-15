@@ -160,6 +160,8 @@ export interface QuantumEntity {
   spofRelevance: string; // empty string if none, otherwise describes the single-point-of-failure exposure
   modalityDependence: QuantumModality;
   isSpeculative: boolean;
+  credibilityScore?: number;
+  credibilityEvidence?: string[];
   pageRank?: number;
   betweennessCentrality?: number;
   industrialLayer?: number; // 0 to 6 representing industrial dependency layers

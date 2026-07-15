@@ -390,8 +390,8 @@ export default function App() {
     government: ["Export compliance audit", "Sovereign funding tracking"]
   });
 
-  // --- APP LEVEL OPERATING STATUS STATE ---
-  const [isOperatingPictureExpanded, setIsOperatingPictureExpanded] = useState<boolean>(true);
+  // --- APP LEVEL OBSERVATORY APERTURE STATE ---
+  const [isObservatoryApertureExpanded, setIsObservatoryApertureExpanded] = useState<boolean>(true);
 
   // --- RAPIDS LENS STATE ---
   const [rapidsWeights, setRapidsWeights] = useState({
@@ -435,6 +435,7 @@ export default function App() {
     fifteen: false,
     ecosystem: false
   });
+  const [falsificationText, setFalsificationText] = useState("");
 
   const [deltaJournal, setDeltaJournal] = useState<DeltaJournalEntry[]>([
     {
@@ -1095,7 +1096,7 @@ export default function App() {
     setJemmaAnswers((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const isJemmaComplete = Object.values(jemmaAnswers).every((v) => v);
+  const isJemmaComplete = Object.values(jemmaAnswers).every((v) => v) && falsificationText.trim().length >= 15;
 
   const handleConfirmJournalEntry = () => {
     const newEntry: DeltaJournalEntry = {
@@ -1107,13 +1108,13 @@ export default function App() {
       confidenceScore: extractedEvidence.confidence,
       jemmaPassed: isJemmaComplete,
       jemmaResponses: [
-        "Thesis unchallenged; Helium reserve contraction confirms supply-chain importance.",
+        "Falsification check: " + falsificationText,
         "Linde (LIN) is a raw physical infrastructure cooling rail.",
         "Generates solid industrial cash flow today.",
         "Undeniable necessity even if quantum timeline extends beyond 15 years.",
         "Acquiring the physical cooling and containment ecosystem, not the qubit modality."
       ],
-      notes: "Provenance trace logged safely. Highly aligned with Principle 1 (Own the Rails).",
+      notes: `Falsifying observations logged: "${falsificationText}". Highly aligned with Lens 8 (Procurement of Credibility).`,
       evidenceStars: extractedEvidence.provClass === "Evidence" ? 5 : 4,
       inferenceStars: Math.floor(Math.random() * 2) + 3, // 3 or 4
       actionabilityStars: Math.floor(Math.random() * 3) + 2 // 2, 3 or 4
@@ -1143,6 +1144,7 @@ export default function App() {
     setWorkflowStep("completed");
     // Reset checks
     setJemmaAnswers({ contra: false, rail: false, cash: false, fifteen: false, ecosystem: false });
+    setFalsificationText("");
   };
 
   // Render markdown text
@@ -1388,7 +1390,9 @@ export default function App() {
               <h1 className="text-lg font-bold font-display tracking-tight text-white glow-cyan">PATHFINDER DOCTRINE</h1>
               <span className="text-[9px] bg-cyan-950 text-cyan-400 border border-cyan-800/60 px-1.5 py-0.5 rounded font-mono font-bold uppercase">WALL STREET ALPHA</span>
             </div>
-            <p className="text-xs text-slate-400 font-sans"><span className="text-cyan-400 font-bold font-mono">“Understand reality first. Capital follows.”</span> — A sovereign evidence architecture where positions are outputs of disciplined physical systems reasoning.</p>
+            <p className="text-xs text-slate-400 font-sans">
+              <span className="text-cyan-400 font-bold font-mono">“Understand reality first. Capital follows.”</span> & <span className="text-purple-400 font-bold font-mono">“Procure credibility first. Conviction follows.”</span> — A sovereign evidence architecture where positions are outputs of disciplined physical systems reasoning and verified knowledge.
+            </p>
           </div>
         </div>
 
@@ -1450,9 +1454,9 @@ export default function App() {
       <main className="flex-1 p-5 grid grid-cols-1 xl:grid-cols-12 gap-5 overflow-y-auto" id="main-content-layout">
 
         {/* ========================================================================= */}
-        {/* ================= GLOBAL: TODAY'S OPERATING PICTURE ====================== */}
+        {/* ================= GLOBAL: TODAY'S ACTIVE OBSERVATORY APERTURE ============ */}
         {/* ========================================================================= */}
-        <div className="col-span-12 bg-slate-950/90 border border-slate-800 rounded-xl p-4 shadow-xl relative overflow-hidden" id="global-operating-picture">
+        <div className="col-span-12 bg-slate-950/90 border border-slate-800 rounded-xl p-4 shadow-xl relative overflow-hidden" id="global-observatory-aperture">
           {/* Subtle background glow */}
           <div className="absolute right-0 top-0 w-80 h-32 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -1472,7 +1476,7 @@ export default function App() {
               </span>
               <div>
                 <h2 className="text-xs font-bold text-white uppercase tracking-wider font-display flex items-center gap-2">
-                  <span>Today's Operating Picture (Simulated Sandbox)</span>
+                  <span>Today's Active Observatory Aperture (Active Lens)</span>
                   <span className="text-[10px] bg-amber-950/50 text-amber-400 border border-amber-900/40 px-1.5 py-0.5 rounded font-mono font-bold lowercase">demonstration v0.2</span>
                 </h2>
                 <p className="text-[10px] text-slate-500 font-mono">Disciplined evidence systems monitoring & verification pipeline</p>
@@ -1480,11 +1484,11 @@ export default function App() {
             </div>
             
             <button
-              onClick={() => setIsOperatingPictureExpanded(!isOperatingPictureExpanded)}
+              onClick={() => setIsObservatoryApertureExpanded(!isObservatoryApertureExpanded)}
               className="px-2 py-1 bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-white rounded text-[10px] font-mono border border-slate-800 transition-all flex items-center gap-1"
             >
-              <span>{isOperatingPictureExpanded ? "COLLAPSE CONSOLE" : "EXPAND CONSOLE"}</span>
-              <span>{isOperatingPictureExpanded ? "▲" : "▼"}</span>
+              <span>{isObservatoryApertureExpanded ? "COLLAPSE APERTURE" : "EXPAND APERTURE"}</span>
+              <span>{isObservatoryApertureExpanded ? "▲" : "▼"}</span>
             </button>
           </div>
 
@@ -1537,7 +1541,7 @@ export default function App() {
             </div>
           </div>
 
-          {isOperatingPictureExpanded && (
+          {isObservatoryApertureExpanded && (
             <div className="mt-4 pt-3.5 border-t border-slate-900 grid grid-cols-1 lg:grid-cols-12 gap-4 animate-fade-in" id="operating-console-details">
               
               {/* Active contradiction alarm box */}
@@ -1647,6 +1651,20 @@ export default function App() {
                   <span className="text-[10px] bg-slate-950 text-slate-400 px-2 py-0.5 rounded border border-slate-850">Semiconductor Packaging</span>
                   <span className="text-[10px] bg-slate-950 text-slate-400 px-2 py-0.5 rounded border border-slate-850">Industrial Gases</span>
                   <span className="text-[10px] bg-slate-950 text-slate-400 px-2 py-0.5 rounded border border-slate-850">High-Bandwidth Switches</span>
+                </div>
+              </div>
+
+              {/* Epistemic Twin Banner */}
+              <div className="bg-[#140b20]/80 border border-purple-900/40 p-4 rounded-xl shadow-lg relative overflow-hidden">
+                <div className="absolute right-0 bottom-0 text-purple-950 text-7xl font-bold select-none pointer-events-none tracking-tighter opacity-15">EVIDENCE</div>
+                <h3 className="text-xs font-bold text-purple-400 uppercase tracking-widest font-display mb-1">Principle 8 — Procurement of Credibility</h3>
+                <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                  Evolve from sector-specific technology bets to a sovereign evidence-bound architecture. Yesterday, we established: <span className="text-white font-medium italic">“Understand reality first. Capital follows.”</span> Today, we deploy its twin: <span className="text-purple-300 font-medium italic">“Procure credibility first. Conviction follows.”</span> Every node, edge, and finding must earn its promotion through rigorous falsification and multi-source corroboration.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-[10px] bg-slate-950 text-purple-300 px-2 py-0.5 rounded border border-purple-950">Observation Verification</span>
+                  <span className="text-[10px] bg-slate-950 text-purple-400 px-2 py-0.5 rounded border border-purple-950">Multi-Source Corroboration</span>
+                  <span className="text-[10px] bg-slate-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-950">Red Team Challenge</span>
                 </div>
               </div>
 
@@ -2402,6 +2420,25 @@ export default function App() {
                           <span className="text-slate-300">5. Am I buying technology or an ecosystem? (Verify full integration moats.)</span>
                         </label>
                       </div>
+
+                      <div className="mt-4 border-t border-slate-850 pt-3">
+                        <span className="text-[10px] text-purple-400 font-mono font-bold uppercase tracking-widest block mb-1">
+                          🐾 Lens 8 Epistemic Check: Missing Evidence & Falsifying Notes
+                        </span>
+                        <textarea
+                          value={falsificationText}
+                          onChange={(e) => setFalsificationText(e.target.value)}
+                          placeholder="Identify what evidence is missing or what observations would immediately falsify this thesis (min 15 characters required)..."
+                          className="w-full h-16 bg-slate-950 border border-slate-800 rounded p-2 text-xs font-mono text-slate-300 placeholder-slate-600 focus:outline-none focus:border-cyan-500/80"
+                        />
+                        <div className="flex justify-between text-[9px] text-slate-500 font-mono mt-1">
+                          <span>Falsification Rigor</span>
+                          <span className={falsificationText.trim().length >= 15 ? "text-emerald-400 font-bold" : "text-amber-500 animate-pulse"}>
+                            {falsificationText.trim().length}/15 chars required
+                          </span>
+                        </div>
+                      </div>
+
                     </div>
 
                     <div className="flex gap-2">

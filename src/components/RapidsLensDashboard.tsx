@@ -69,6 +69,8 @@ export interface ApertureRow {
   confidence: number;
   timestamp: string;
   schemaVersion: string;
+  credibilityScore?: number;
+  credibilityEvidence?: string[];
 }
 
 export interface AnalysisJob {
@@ -93,7 +95,7 @@ export interface AnalysisJob {
 }
 
 export const APERTURES_DATA: Record<
-  "finance" | "music" | "quantum" | "culinary" | "clinical",
+  "finance" | "music" | "quantum" | "culinary" | "clinical" | "robotics",
   ApertureRow[]
 > = {
   finance: [
@@ -120,7 +122,14 @@ export const APERTURES_DATA: Record<
       },
       confidence: 95,
       timestamp: "2026-07-12 04:30:12",
-      schemaVersion: "1.0.0-alpha"
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 92,
+      credibilityEvidence: [
+        "10-Q filing from Q1 2026 with detailed datacenter revenue segment breakdown",
+        "Developer usage stats for cuQuantum and CUDA downloads",
+        "Major enterprise partner announcements (MSFT, AMZN AWS)",
+        "Independent software moat engineering validation"
+      ]
     },
     {
       id: "LIN",
@@ -145,7 +154,14 @@ export const APERTURES_DATA: Record<
       },
       confidence: 98,
       timestamp: "2026-07-11 22:15:45",
-      schemaVersion: "1.0.0-alpha"
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 98,
+      credibilityEvidence: [
+        "Wyoming state industrial development board construction filings",
+        "Foundry cryogenic gas supply agreement records",
+        "Air separation plant capacity engineering audit reports",
+        "Sovereign helium reserve stockpiling disclosures"
+      ]
     },
     {
       id: "AMAT",
@@ -170,7 +186,48 @@ export const APERTURES_DATA: Record<
       },
       confidence: 95,
       timestamp: "2026-07-12 01:10:00",
-      schemaVersion: "1.0.0-alpha"
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 95,
+      credibilityEvidence: [
+        "Sovereign export control license renewal public disclosures",
+        "EUV chamber gas injection patent filings",
+        "Quarterly earnings call transcripts highlighting foundry hardware tooling backlog",
+        "Independent chip packaging manufacturing audits"
+      ]
+    },
+    {
+      id: "ASML",
+      name: "ASML Holding NV (EUV Systems)",
+      classification: "Materials",
+      metrics: {
+        "Cash Flow": 95,
+        "Ecosystem Position": 100,
+        "Capital Intensity": 90,
+        "Government Contracts": 75,
+        "AI Integration": 50,
+        "Supply Chain Importance": 100,
+        "Scientific Leadership": 98
+      },
+      observations: [
+        "Monopolizes extreme ultraviolet lithography (EUV) production machinery.",
+        "Experiencing backlog extensions for High-NA EUV system shipments to TSMC."
+      ],
+      evidenceBindings: {
+        pattern: "Physical choke point of high-density silicon fabrication.",
+        contradicts: "Vulnerable to Dutch export restrictions and geopolitical bottlenecks."
+      },
+      confidence: 97,
+      timestamp: "2026-07-12 10:20:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 99,
+      credibilityEvidence: [
+        "SEC Filings (10-K & annual reports on shipment backlogs)",
+        "Patent Evidence (Worldwide laser-produced plasma EUV source IP)",
+        "Supplier Disclosures (Zeiss glass and Trumpf CO2 laser agreements)",
+        "Independent Corroboration (Foundry shipment receipts from TSM & INTC)",
+        "Operator Review Completed",
+        "Red Team Audit Completed"
+      ]
     }
   ],
   music: [
@@ -274,7 +331,14 @@ export const APERTURES_DATA: Record<
       },
       confidence: 74,
       timestamp: "2026-07-11 11:30:15",
-      schemaVersion: "1.0.0-alpha"
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 88,
+      credibilityEvidence: [
+        "Nature journal publications (Quantum Supremacy, 2019)",
+        "IEEE spectrum conference reports (Cryo-package scaling)",
+        "Google Quantum AI lab public software API releases",
+        "Independent peer review validation from national laboratories"
+      ]
     },
     {
       id: "YB171",
@@ -299,7 +363,14 @@ export const APERTURES_DATA: Record<
       },
       confidence: 41,
       timestamp: "2026-07-12 02:45:10",
-      schemaVersion: "1.0.0-alpha"
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 72,
+      credibilityEvidence: [
+        "SEC Form 10-K detailing hardware roadmap milestones",
+        "Raman transition laser control patent filings",
+        "US Air Force research lab Trapped-Ion research contract",
+        "University of Maryland co-development publications"
+      ]
     },
     {
       id: "SOLITON",
@@ -324,7 +395,14 @@ export const APERTURES_DATA: Record<
       },
       confidence: 63,
       timestamp: "2026-07-10 16:55:00",
-      schemaVersion: "1.0.0-alpha"
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 65,
+      credibilityEvidence: [
+        "Global patent applications for silicon photonic routing switches",
+        "UK Innovate grant funding records and milestone press releases",
+        "PsiQuantum-SLAC national accelerator laboratory collaboration notes",
+        "Scientific advisory board peer-reviewed preprint archives"
+      ]
     }
   ],
   culinary: [
@@ -430,8 +508,538 @@ export const APERTURES_DATA: Record<
       timestamp: "2026-07-12 03:20:00",
       schemaVersion: "1.0.0-alpha"
     }
+  ],
+  robotics: [
+    {
+      id: "FIG",
+      name: "Figure AI (Humanoid Robot)",
+      classification: "Humanoid Robot (Layer 6)",
+      metrics: {
+        "Actuator Torque": 85,
+        "Battery Energy": 78,
+        "Thermal Tolerance": 80,
+        "Control Latency": 90,
+        "Balance System": 88,
+        "Friction Coefficient": 60,
+        "Contact Force Control": 82
+      },
+      observations: [
+        "Figure 02 released with integrated speech-to-speech reasoning capabilities.",
+        "Operational trials deployed inside BMW manufacturing cleanroom lines."
+      ],
+      evidenceBindings: {
+        pattern: "Relies on advanced hydraulic/electric hybrid actuators for joint torque stability.",
+        contradicts: "High energy drain reduces continuous duty cycle to under 120 minutes."
+      },
+      confidence: 90,
+      timestamp: "2026-07-14 11:20:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 88,
+      credibilityEvidence: [
+        "BMW Spartanburg plant trial press releases & video evidence",
+        "OpenAI joint foundation model technical reports",
+        "Figure 02 official hardware specification sheets"
+      ]
+    },
+    {
+      id: "NVDA_PI",
+      name: "NVIDIA Corp (GR00T / PI)",
+      classification: "AI Foundation Model (Layer 5)",
+      metrics: {
+        "Actuator Torque": 10,
+        "Battery Energy": 12,
+        "Thermal Tolerance": 95,
+        "Control Latency": 98,
+        "Balance System": 95,
+        "Friction Coefficient": 10,
+        "Contact Force Control": 92
+      },
+      observations: [
+        "Project GR00T foundation models demonstrating high transferability across different humanoid designs.",
+        "Physical Intelligence (PI) partnering to integrate low-latency control loops at edge."
+      ],
+      evidenceBindings: {
+        pattern: "Neural network policies trained in Omniverse Isaac Sim bypass traditional kinematic coding.",
+        contradicts: "Edge execution requires massive specialized inference power, adding thermal load to robot chassis."
+      },
+      confidence: 94,
+      timestamp: "2026-07-13 14:05:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 95,
+      credibilityEvidence: [
+        "NVIDIA GTC 2026 Keynote technical slides and demo footage",
+        "Isaac Sim Omniverse physics engine simulation validation logs",
+        "Physical Intelligence Pi-Zero model releases and GitHub code repositories"
+      ]
+    },
+    {
+      id: "HMD",
+      name: "Harmonic Drive Systems (Reducers)",
+      classification: "Precision Gearbox (Layer 4)",
+      metrics: {
+        "Actuator Torque": 100,
+        "Battery Energy": 30,
+        "Thermal Tolerance": 88,
+        "Control Latency": 94,
+        "Balance System": 90,
+        "Friction Coefficient": 95,
+        "Contact Force Control": 85
+      },
+      observations: [
+        "Supplying zero-backlash strain wave gearing to premium humanoid actuators.",
+        "Expanding production capacity in Japan to meet soaring humanoid joint reducer demand."
+      ],
+      evidenceBindings: {
+        pattern: "Zero-backlash and high torque-to-weight ratio are critical for joint control precision.",
+        contradicts: "Highly vulnerable to specialized material shortages and long qualification times for alternative suppliers."
+      },
+      confidence: 98,
+      timestamp: "2026-07-12 09:30:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 97,
+      credibilityEvidence: [
+        "Harmonic Drive Systems quarterly investor relations deck (Q1 2026)",
+        "Patent database registries for flexible spline wave gear designs",
+        "Independent robotic arm teardown and engineering reviews"
+      ]
+    },
+    {
+      id: "SHAD",
+      name: "Shadow Robot Co (Dexterity)",
+      classification: "Actuators & Sensors (Layer 4)",
+      metrics: {
+        "Actuator Torque": 88,
+        "Battery Energy": 45,
+        "Thermal Tolerance": 82,
+        "Control Latency": 96,
+        "Balance System": 80,
+        "Friction Coefficient": 85,
+        "Contact Force Control": 99
+      },
+      observations: [
+        "Integrated dual-channel tactile force sensors into five-fingered anthropomorphic hands.",
+        "Demonstrated 20ms response time using etherCAT low-latency communication bus."
+      ],
+      evidenceBindings: {
+        pattern: "Direct-drive motors coupled with high-frequency force sensors allow high tactile sensitivity.",
+        contradicts: "High mechanical complexity reduces mean time between failures (MTBF) to 500 hours."
+      },
+      confidence: 92,
+      timestamp: "2026-07-12 16:45:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 91,
+      credibilityEvidence: [
+        "Shadow Robot Hand specifications & CAD drawings",
+        "Tactile sensor calibration paper from IEEE Robotics and Automation journal",
+        "University of Edinburgh robotics lab field reports"
+      ]
+    },
+    {
+      id: "NSK",
+      name: "NSK Ltd (Precision Bearings)",
+      classification: "Bearings & Cables (Layer 3)",
+      metrics: {
+        "Actuator Torque": 95,
+        "Battery Energy": 20,
+        "Thermal Tolerance": 92,
+        "Control Latency": 90,
+        "Balance System": 85,
+        "Friction Coefficient": 98,
+        "Contact Force Control": 40
+      },
+      observations: [
+        "Sourcing high-durability thin-section ball bearings to humanoid joint structures.",
+        "Optimizing lubricating grease formulation for cryo-temperature planetary explorations."
+      ],
+      evidenceBindings: {
+        pattern: "Low-friction bearing systems minimize active heat generation and conserve battery reserves.",
+        contradicts: "Heavy reliance on specialized steel suppliers and rolling element factories in specific geographic hubs."
+      },
+      confidence: 96,
+      timestamp: "2026-07-11 10:15:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 96,
+      credibilityEvidence: [
+        "NSK Industrial Bearing Catalogue & structural CAD diagrams",
+        "Tokyo Stock Exchange financial releases",
+        "ASTM International friction and lubrication standards"
+      ]
+    },
+    {
+      id: "LIN_HE",
+      name: "Linde PLC (Materials / Refinement)",
+      classification: "Materials & Vacuum (Layer 2)",
+      metrics: {
+        "Actuator Torque": 20,
+        "Battery Energy": 35,
+        "Thermal Tolerance": 99,
+        "Control Latency": 50,
+        "Balance System": 30,
+        "Friction Coefficient": 90,
+        "Contact Force Control": 20
+      },
+      observations: [
+        "Supplying high-purity argon and helium gases for motor lamination vacuum deposition.",
+        "Establishing direct supply chains to magnetic rare-earth sinter factories in North America."
+      ],
+      evidenceBindings: {
+        pattern: "Motor laminations require oxygen-free high-vacuum environments to avoid eddy current losses.",
+        contradicts: "Industrial gas prices fluctuate wildly based on regional energy grid constraints."
+      },
+      confidence: 99,
+      timestamp: "2026-07-10 08:00:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 98,
+      credibilityEvidence: [
+        "Linde industrial gas delivery route logs and customer supply agreements",
+        "Vacuum deposition chamber system engineering blueprints",
+        "Sovereign helium reserve contract disclosures"
+      ]
+    },
+    {
+      id: "BHP",
+      name: "BHP Billiton (Copper & Lithium)",
+      classification: "Mining & Geology (Layer 1)",
+      metrics: {
+        "Actuator Torque": 15,
+        "Battery Energy": 100,
+        "Thermal Tolerance": 95,
+        "Control Latency": 10,
+        "Balance System": 10,
+        "Friction Coefficient": 50,
+        "Contact Force Control": 10
+      },
+      observations: [
+        "Expanding copper extraction mines in Chile to support global EV and humanoid motor coils.",
+        "Developing high-purity spodumene lithium refining pipelines for advanced solid-state batteries."
+      ],
+      evidenceBindings: {
+        pattern: "Copper coil density determines the maximum torque output of electric actuators before overheating.",
+        contradicts: "Extremely long project lead times: developing a new copper mine averages 10 to 15 years."
+      },
+      confidence: 95,
+      timestamp: "2026-07-09 13:40:00",
+      schemaVersion: "1.0.0-alpha",
+      credibilityScore: 94,
+      credibilityEvidence: [
+        "Escondida Copper Mine expansion filings & production tonnage reports",
+        "London Metal Exchange (LME) copper purity grading standards",
+        "Lithium spodumene refinery environmental permit approvals"
+      ]
+    }
   ]
 };
+
+function getApertureContent(rowId: string, aperture: string, row: any) {
+  const isRobotics = ["FIG", "NVDA_PI", "HMD", "SHAD", "NSK", "LIN_HE", "BHP"].includes(rowId);
+  const isQuantum = ["SYCAMORE", "ORE_OAK", "CRYOP_HE", "FRMEM_SEC", "KEY_ELEC"].includes(rowId);
+  const isLinde = rowId === "LIN";
+  const isNvda = rowId === "NVDA";
+  
+  if (aperture === "financial") {
+    let focus = `Evaluates capital efficiency, investment grade, and cash conversion models. Positions are treated as outputs of real physical systems reasoning.`;
+    let metrics: [string, string][] = [
+      ["Capital Class", "Infrastructure Rail"],
+      ["Investment Priority", "High Asset Moat"],
+      ["Cash Conversion Index", "94% Excellent"]
+    ];
+    
+    if (rowId === "FIG") {
+      focus = `Early-stage private equity backed by a powerful tech consortium (NVIDIA, Jeff Bezos, Microsoft, OpenAI, Intel). Valuation is highly speculative but enjoys supreme liquidity access. Continuous hardware R&D is fully funded with a long, comfortable runway.`;
+      metrics = [
+        ["Speculative Valuation", "$2.6B+ USD"],
+        ["Cash Runway", "48 Months (Guaranteed)"],
+        ["Consortium Funding", "$675M Series B"],
+        ["Capital Efficiency", "High for Modality"]
+      ];
+    } else if (rowId === "NVDA_PI" || rowId === "NVDA") {
+      focus = `Supreme financial moat. Historic public tech leader with incredible net profit margins (>60%). Unparalleled free cash flow generation enables massive ongoing R&D and physical simulation (Omniverse) funding.`;
+      metrics = [
+        ["Sovereign Market Cap", "$3.1T Public"],
+        ["Net Cash Margin", "62% Record"],
+        ["R&D Spend (Annual)", "$8.2B USD"],
+        ["Investment Classification", "Core Computing Platform"]
+      ];
+    } else if (rowId === "HMD") {
+      focus = `Monopoly public market proxy for precision mechanical joints. Standard supplier with predictable industrial cash flows, high pricing power, and an expanding order backlog due to global humanoid deployment.`;
+      metrics = [
+        ["Operating Profit Margin", "28% Stable"],
+        ["Order Backlog Growth", "+45% YoY (2026)"],
+        ["Capital Intensity", "Medium-High"],
+        ["Reinvestment Rate", "14.2% in R&D"]
+      ];
+    } else if (rowId === "LIN" || rowId === "LIN_HE") {
+      focus = `Absolute raw physical infrastructure cooling rail. Massive stable cash flow from multi-sector heavy industry contracts. Earns solid utility-like yields today and operates as a non-discretionary supplier regardless of quantum timeline delays.`;
+      metrics = [
+        ["Annual Revenue", "$33.2B USD"],
+        ["Free Cash Flow Yield", "5.8% Stable"],
+        ["Dividend History", "30+ Years Consecutive"],
+        ["Asset Turnover", "0.68 Stable"]
+      ];
+    } else if (rowId === "SHAD") {
+      focus = `Niche advanced private robotic hand and sensory developer. Backed by UK government research grants and university collaborations. Highly capital efficient with a focus on high-margin specialized components.`;
+      metrics = [
+        ["Funding Type", "Grants & Custom Contracts"],
+        ["Gross Margins on Parts", "72% Premium"],
+        ["Runway Security", "24 Months"],
+        ["Commercialization Phase", "Scale-up Trialing"]
+      ];
+    } else if (rowId === "NSK") {
+      focus = `High-volume industrial manufacturing giant. Steady revenues from traditional automotive and manufacturing clients, now with high-margin expansion vectors in humanoid thin-section joints.`;
+      metrics = [
+        ["Valuation Multiples", "9.4x EV/EBITDA (Value Play)"],
+        ["Sovereign Market Cap", "¥480B JPY"],
+        ["Dividend Yield", "3.2%"],
+        ["R&D as % of Sales", "4.8%"]
+      ];
+    } else if (rowId === "BHP") {
+      focus = `Commodity physical producer with unmatched balance sheet scale. Low cost-curve producer of copper and lithium. High dividend yield with extreme structural leverage to structural clean energy grids and humanoid wiring density.`;
+      metrics = [
+        ["Sovereign Market Cap", "$140B USD"],
+        ["Cost Curve Position", "Bottom 25% (First Quartile)"],
+        ["Free Cash Flow", "$12.4B Stable"],
+        ["Dividend Yield", "6.2%"]
+      ];
+    }
+    
+    return { focus, metrics, title: "Capital & Valuation Lens" };
+  }
+  
+  if (aperture === "industrial") {
+    let focus = `Tracks supply chain dependencies, single point of failure (SPOF) risks, key suppliers, qualification burdens, and alternative capacity constraints.`;
+    let metrics: [string, string][] = [
+      ["Substitutability", "Low - Extremely Hard"],
+      ["Assembly Lead Time", "120 Days Avg"],
+      ["Dependency Risk", "Strategic Dependency"]
+    ];
+    
+    if (rowId === "FIG") {
+      focus = `Integrates Level 4 actuators and specialized zero-backlash harmonic drives. Extreme dependency on Japanese strain-wave gears (Harmonic Drive Systems) and German thin ball bearings (NSK). Lack of supplier diversification creates severe queue risk.`;
+      metrics = [
+        ["Joint Gearing Lock-In", "Harmonic Drive (100%)"],
+        ["SPOF Status", "Potential SPOF (High Concentration)"],
+        ["Lead Time to Build", "180 Days (High Backlog)"],
+        ["Tactile Hand Partner", "Shadow Robot Co"]
+      ];
+    } else if (rowId === "NVDA_PI" || rowId === "NVDA") {
+      focus = `Ultimate digital-physical controller. Project GR00T foundation models must run on high-end inference chips. Highly reliant on a single sub-nanometer manufacturing foundry bottleneck (TSMC) and advanced ASML EUV packaging lines.`;
+      metrics = [
+        ["Silicon Foundry", "TSMC Taiwan (100%)"],
+        ["Packaging Partner", "ASE / TSMC CoWoS"],
+        ["Software Moat", "CUDA & Omniverse Isaac Sim"],
+        ["SPOF Status", "Critical Single Point of Failure"]
+      ];
+    } else if (rowId === "HMD") {
+      focus = `Enjoys a near-monopoly on zero-backlash strain wave gearing (reducers). High qualification burdens make it almost impossible for humanoid developers to substitute their gears without completely redesigning their joint assemblies.`;
+      metrics = [
+        ["Market Share (Strain Wave)", "78% Global"],
+        ["Qualification Burden", "Extreme (Requires custom recalibration)"],
+        ["Alternative Supplier", "Nidec-Shimpo (Limited volume)"],
+        ["SPOF Status", "Absolute Candidate Bottleneck"]
+      ];
+    } else if (rowId === "LIN" || rowId === "LIN_HE") {
+      focus = `Cryogenic industrial gas logistics is a heavy-machinery distribution rail. Special tankers, cryogenic vacuum-insulated pipelines, and localized gas air separation plants (ASPs) are highly capital intensive. Cryo-refrigeration cannot be shipped via normal freight.`;
+      metrics = [
+        ["Distribution Type", "Insulated Pipeline & Special Tankers"],
+        ["Asset Density", "Extremely High (Local Plants Required)"],
+        ["Substitution Risk", "Zero (Liquid helium is a physical constant)"],
+        ["SPOF Status", "Strategic Supply Chain Anchor"]
+      ];
+    } else if (rowId === "SHAD") {
+      focus = `Specializes in five-fingered tactile dexterous hand assemblies. Extremely intricate mechanical cables, torque pulleys, and tactile sensor nodes. Very low substitutability, but low production volume makes it an artisan-level technology rather than mass-market yet.`;
+      metrics = [
+        ["Assembly Complexity", "Ultra High (Manual Calibration)"],
+        ["Finger Actuator Count", "20 Independent Actuators"],
+        ["SPOF Status", "Concentration Risk"],
+        ["MTBF (Mean Time)", "500 Hours (Mechanical Wear)"]
+      ];
+    } else if (rowId === "NSK") {
+      focus = `Supplying custom thin-section ball bearings to robotic joints. Bearings must withstand high axial loads while maintaining a flat profile to fit inside slim humanoid limb casings. Alternative options require re-tolerancing of the entire casing.`;
+      metrics = [
+        ["Bearing Tolerance", "Sub-micron Precision"],
+        ["Substitution Burden", "Medium (Alternative suppliers like SKF exist)"],
+        ["Factory Hubs", "Japan, Germany, USA"],
+        ["SPOF Status", "Low (Substitute capacity available)"]
+      ];
+    } else if (rowId === "BHP") {
+      focus = `The raw material starting point. Owns the massive Escondida copper mine in Chile, the largest copper producing operation in the world. Humanoid electrical motor winding coils and battery conductors depend directly on copper refinery capacity.`;
+      metrics = [
+        ["Primary Asset", "Escondida Mine (Chile)"],
+        ["Supply Concentration", "High (Chilean/Peruvian hubs)"],
+        ["Project Lead Time", "10-15 Years to open a new mine"],
+        ["SPOF Status", "Macro Resource Choke Point"]
+      ];
+    }
+    
+    return { focus, metrics, title: "Industrial & Dependency Lens" };
+  }
+  
+  if (aperture === "physics") {
+    let focus = `Investigates immutable physical and thermodynamic constraints: actuator torque densities, battery energy densities, thermal dissipation limits, and raw material physical properties.`;
+    let metrics: [string, string][] = [
+      ["Thermal Limit", "65°C Operating"],
+      ["Efficiency Rating", "85% Nominal"],
+      ["Physical Moat", "Thermal Conduction"]
+    ];
+    
+    if (rowId === "FIG") {
+      focus = `Battery energy density limits continuous duty cycle to ~120 minutes. Actuator torque output is heavily constrained by motor winding resistance (eddy current losses) and heat accumulation within closed joint housings. Overheating triggers automatic current throttling.`;
+      metrics = [
+        ["Max Torque Density", "110 Nm/kg"],
+        ["Battery Energy Density", "280 Wh/kg (Spec Limit)"],
+        ["Heat Dissipation Rate", "95W Continuous"],
+        ["Control Loop Latency", "1.2ms (Kinematic Update)"]
+      ];
+    } else if (rowId === "NVDA_PI" || rowId === "NVDA") {
+      focus = `Classical silicon processing is hitting quantum tunneling limits. High compute workloads in humanoid edge inference engines create localized heat spots. Liquid-cooled data centers are required for training, and edge chips must stay within strict watt-envelopes.`;
+      metrics = [
+        ["Thermal Envelope", "75W Edge / 700W Server"],
+        ["Quantum Gate Limit", "Sub-3nm electron leakage"],
+        ["Inference Latency", "12ms (Pi-Zero local model)"],
+        ["Data Bandwidth", "900 GB/s (NVLink-6)"]
+      ];
+    } else if (rowId === "HMD") {
+      focus = `Strain-wave gear teeth suffer extreme mechanical friction. Gearing designs must optimize the elastic deformation of the flexible outer spline. Lubricating grease must maintain optimal viscosity across cryogenic (-40°C) and extreme heat (+80°C) ranges.`;
+      metrics = [
+        ["Backlash Tolerance", "0.00 Arc-Min (Zero-Backlash)"],
+        ["Mechanical Efficiency", "78% At Full Load"],
+        ["Lubricant Tolerance", "-50°C to +120°C"],
+        ["Friction Losses", "12% Continuous Heat Load"]
+      ];
+    } else if (rowId === "LIN" || rowId === "LIN_HE") {
+      focus = `Cryogenic physical constraints: liquid Helium boils at 4.2K (-269°C). Any heat leak in transport triggers rapid gas expansion and pressure safety venting. Demands extreme vacuum-insulated double-wall piping and constant mechanical cooling loops.`;
+      metrics = [
+        ["Cryogenic Temperature", "4.2 Kelvin (Boiling Point)"],
+        ["Vacuum Integrity", "10^-6 Torr Required"],
+        ["Energy Cost to Liquefy", "12 kWh per Liter"],
+        ["Thermal Insulator Score", "99.8% (Vacuum Jacket)"]
+      ];
+    } else if (rowId === "SHAD") {
+      focus = `Five-fingered hand precision relies on micro-torque actuators and direct-drive motor systems. Low contact force sensors use piezoresistive arrays to dynamically measure fingertip pressure, which must respond within milliseconds to prevent grip slippage or object crushing.`;
+      metrics = [
+        ["Contact Resolution", "0.1 Newtons (Piezoresistive)"],
+        ["Actuator Frequency", "2.4 kHz Loop Speed"],
+        ["Mechanical Pulley Tension", "220 Newtons Max"],
+        ["Friction Dampening", "3.2% (Extremely Fluid)"]
+      ];
+    } else if (rowId === "NSK") {
+      focus = `Bearing structures are constrained by rolling resistance and structural deformation under radial stress. Thin-section ball bearings utilize ceramic silicon nitride balls (Si3N4) to reduce centripetal friction and prevent electrical discharge from joint motors.`;
+      metrics = [
+        ["Rolling Resistance", "0.0015 (Ceramic ball standard)"],
+        ["Load Capacity (Radial)", "12,500 Newtons"],
+        ["Max Operating RPM", "12,000 RPM (Joint-level overshoot)"],
+        ["Dielectric Insulation", "15 kV Breakdown Resistance"]
+      ];
+    } else if (rowId === "BHP") {
+      focus = `Copper is the ultimate physical highway for electricity. Pure copper coils are constrained by electrical resistivity (1.68 × 10^-8 Ω·m at 20°C). Overcoming resistance requires high-purity oxygen-free copper (OFC) wire to prevent resistive power loss (I^2*R) inside motors.`;
+      metrics = [
+        ["Copper Purity Grade", "99.99% Oxygen-Free (OFC)"],
+        ["Electrical Resistivity", "1.68 × 10^-8 Ohm-meters"],
+        ["Thermal Conductivity", "401 W/m·K"],
+        ["Tensile Strength", "220 MPa (Structural limits)"]
+      ];
+    }
+    
+    return { focus, metrics, title: "Physics & Thermodynamics Lens" };
+  }
+  
+  if (aperture === "credibility") {
+    let focus = `Audits our core epistemic rule: "Procure credibility first. Conviction follows." Reviews the verification chain, observation provenance, and potential falsifying observations.`;
+    let metrics: [string, string][] = [
+      ["Audit Status", "Verified Provenance"],
+      ["Corroboration Level", "Multi-Source Match"],
+      ["Falsification Checked", "Yes"]
+    ];
+    
+    const score = row.credibilityScore || 85;
+    const evidenceList = row.credibilityEvidence || [
+      "SEC Form 10-K Supply Contract disclosure",
+      "Sovereign reserve inventory reports",
+      "Independent technical plant operations audit"
+    ];
+    
+    focus = `Epistemic verification trace completed. To maintain our sovereign audit standard, this record compiles verified source documents, preventing model hallucination or blind consensus buy-in.`;
+    metrics = [
+      ["Credibility Rating", `${score}% Verified`],
+      ["Verification Sources", `${evidenceList.length} Ingested`],
+      ["Data Integrity", "SHA-256 Provenance Lock"],
+      ["Falsification Standard", "Lens 8 Compliant"]
+    ];
+    
+    return { focus, metrics, title: "Credibility & Verification Lens" };
+  }
+  
+  if (aperture === "geopolitical") {
+    let focus = `Tracks regional resource concentrations, trade sanction exposure, international supply chain choke points, national subsidies (e.g. CHIPS Act), and sovereign protective shields.`;
+    let metrics: [string, string][] = [
+      ["Regional Risk", "Low-Moderate"],
+      ["Sovereign Subsidy", "Qualified (US/EU CHIPS)"],
+      ["Export Category", "EAR-99 Dual Use"]
+    ];
+    
+    if (rowId === "FIG") {
+      focus = `Silicon fabrication in TSMC (Taiwan), magnetic rare earth mining in highly restricted regions (Inner Mongolia), and final assembly in California, USA. Vulnerable to trade escalations and rare-earth embargoes.`;
+      metrics = [
+        ["Rare-Earth Origin", "Restricted Hubs (95%)"],
+        ["Silicon Origin", "Taiwan Strait (TSMC)"],
+        ["Tariff Sensitivity", "High (Class 85.01)"],
+        ["Sovereign Protection", "US National Security Priority"]
+      ];
+    } else if (rowId === "NVDA_PI" || rowId === "NVDA") {
+      focus = `Core semiconductor assets reside in high-tension geopolitical areas. Subject to strict export controls on high-end computing components and advanced manufacturing machinery (ASML tools). National sovereignty priority.`;
+      metrics = [
+        ["Silicon Location", "Taiwan Strait (TSMC)"],
+        ["Export Sanctions", "Active restriction list (China/Russia)"],
+        ["Sovereign Shield", "US CHIPS Act Direct Beneficiary"],
+        ["Logistics Risk", "High (Maritime Straits)"]
+      ];
+    } else if (rowId === "HMD") {
+      focus = `Primary manufacturing plants located in Japan. Insulated from high-friction direct trade disputes, but heavily dependent on Japanese raw specialty steel imports and domestic energy stability.`;
+      metrics = [
+        ["Manufacturing Location", "Nagano / Chiba, Japan"],
+        ["Trade Friction", "Low (US-Japan Trade Accord)"],
+        ["Steel Source", "Nippon Steel Specialty Grains"],
+        ["Logistics Risk", "Low-Medium (Pacific Shipping)"]
+      ];
+    } else if (rowId === "LIN" || rowId === "LIN_HE") {
+      focus = `Liquid Helium extraction is localized to rare gas deposits (primarily US BLM Reserves, Qatar, and Russian Amur Plant). Regional closures or refinery pipeline failures trigger severe global price shocks and localized rationing.`;
+      metrics = [
+        ["Helium Production Hubs", "Qatar (35%), US BLM (30%), Russia (22%)"],
+        ["Sovereign Helium Reserve", "Direct US Federal Custody"],
+        ["Pipeline Vulnerability", "High (Trans-continental liquified shipping)"],
+        ["Gas Tariff Rating", "Zero-Tariff Exempt"]
+      ];
+    } else if (rowId === "SHAD") {
+      focus = `Based in London, UK, with specialized research partners across Western Europe and academic labs. Insulated from severe global physical trade bottlenecks, but vulnerable to Brexit-era specialized talent and component shipping friction.`;
+      metrics = [
+        ["Primary Headquarters", "London, United Kingdom"],
+        ["Sovereign Funding", "UK Research and Innovation (UKRI)"],
+        ["Trade Friction", "Moderate (Post-Brexit customs barriers)"],
+        ["Specialist Talent Pool", "Western European academic pipelines"]
+      ];
+    } else if (rowId === "NSK") {
+      focus = `Global manufacturer with plants in Japan, USA, Germany, and Brazil. Highly diversified footprint protects it from localized tariff barriers, but remains vulnerable to steel alloy pricing and automotive supply-chain slow-downs.`;
+      metrics = [
+        ["Production Diversification", "High (Multi-country factories)"],
+        ["Raw Alloy Dependency", "German & Japanese steel converters"],
+        ["Sanction Exposure", "Minimal (Dual-use civilian bearings)"],
+        ["Logistics Choke Points", "Low (Local domestic distribution hubs)"]
+      ];
+    } else if (rowId === "BHP") {
+      focus = `Mining operations are geographically static. Extreme concentration in South America (copper) and Australia (iron ore/lithium). Trade flows heavily to Chinese refineries, making it highly sensitive to maritime shipping rates (Baltic Dry Index) and Chinese industrial output.`;
+      metrics = [
+        ["Geographic Extraction", "Escondida (Chile), Western Australia"],
+        ["Refinement Hub Density", "70% Concentrated in Asia"],
+        ["Logistics Route", "Pacific Maritime Bulk Carriers"],
+        ["Sovereign Shield", "Strategic National Resource of Australia"]
+      ];
+    }
+    
+    return { focus, metrics, title: "Geopolitical & Resource Lens" };
+  }
+  
+  return { focus: "", metrics: [], title: "" };
+}
 
 interface RapidsLensDashboardProps {
   allocation: Allocation;
@@ -785,9 +1393,9 @@ export default function RapidsLensDashboard({
   };
 
   // EvidenceFrame State
-  const [selectedAperture, setSelectedAperture] = useState<"finance" | "music" | "quantum" | "culinary" | "clinical">("finance");
+  const [selectedAperture, setSelectedAperture] = useState<"finance" | "music" | "quantum" | "culinary" | "clinical" | "robotics">("finance");
   const [selectedApertureRowId, setSelectedApertureRowId] = useState<string>("NVDA");
-  const [activeSpecView, setActiveSpecView] = useState<"columns" | "semantics" | "provenance" | "json">("columns");
+  const [activeSpecView, setActiveSpecView] = useState<"financial" | "industrial" | "physics" | "credibility" | "geopolitical" | "json">("financial");
   const [gpuSimulating, setGpuSimulating] = useState<boolean>(false);
   const [gpuSimTime, setGpuSimTime] = useState<number>(0.0);
   const [gpuSimLog, setGpuSimLog] = useState<string[]>([
@@ -801,7 +1409,8 @@ export default function RapidsLensDashboard({
       music: "BEET9",
       quantum: "SYCAMORE",
       culinary: "TRUFFLE",
-      clinical: "CAS9"
+      clinical: "CAS9",
+      robotics: "FIG"
     };
     setSelectedApertureRowId(firstIdMap[selectedAperture] || "NVDA");
   }, [selectedAperture]);
@@ -1675,13 +2284,14 @@ export default function RapidsLensDashboard({
                   Select Active Aperture:
                 </span>
                 <div className="flex flex-wrap items-center gap-1">
-                  {(["finance", "music", "quantum", "culinary", "clinical"] as const).map((ap) => {
+                  {(["finance", "music", "quantum", "culinary", "clinical", "robotics"] as const).map((ap) => {
                     const apLabels: Record<string, { label: string; color: string; bg: string }> = {
                       finance: { label: "Wall Street (Finance)", color: "text-blue-400 border-blue-500/40", bg: "bg-blue-500/10" },
                       music: { label: "Acoustic Sync (Music)", color: "text-pink-400 border-pink-500/40", bg: "bg-pink-500/10" },
                       quantum: { label: "Qubit Modality (Quantum)", color: "text-purple-400 border-purple-500/40", bg: "bg-purple-500/10" },
                       culinary: { label: "Umami Synthesis (Culinary)", color: "text-amber-400 border-amber-500/40", bg: "bg-amber-500/10" },
-                      clinical: { label: "Exome Profile (Clinical)", color: "text-emerald-400 border-emerald-500/40", bg: "bg-emerald-500/10" }
+                      clinical: { label: "Exome Profile (Clinical)", color: "text-emerald-400 border-emerald-500/40", bg: "bg-emerald-500/10" },
+                      robotics: { label: "Physical Stack (Robotics)", color: "text-fuchsia-400 border-fuchsia-500/40", bg: "bg-fuchsia-500/10" }
                     };
                     const meta = apLabels[ap];
                     const isActive = selectedAperture === ap;
@@ -1722,6 +2332,7 @@ export default function RapidsLensDashboard({
                         {Object.keys(APERTURES_DATA[selectedAperture][0].metrics).map((mKey) => (
                           <th key={mKey} className="p-2.5 text-center">{mKey}</th>
                         ))}
+                        <th className="p-2.5 text-right text-purple-400">Credibility</th>
                         <th className="p-2.5 text-right pr-4 text-emerald-400">Confidence</th>
                       </tr>
                     </thead>
@@ -1742,6 +2353,9 @@ export default function RapidsLensDashboard({
                                 {row.metrics[mKey]}
                               </td>
                             ))}
+                            <td className="p-2.5 text-right font-bold text-purple-400">
+                              {row.credibilityScore ? `${row.credibilityScore}%` : "85%"}
+                            </td>
                             <td className="p-2.5 text-right pr-4 font-bold text-emerald-400">
                               {row.confidence}%
                             </td>
@@ -1856,97 +2470,96 @@ export default function RapidsLensDashboard({
                     </div>
 
                     {/* Specification focus navigation */}
-                    <div className="flex border-b border-slate-900 pb-1.5 gap-2" id="spec-tabs">
-                      {(["columns", "semantics", "provenance", "json"] as const).map((vt) => {
-                        const vtLabels: Record<string, string> = {
-                          columns: "Required Fields",
-                          semantics: "Evidence Bind",
-                          provenance: "Observations",
-                          json: "Raw JSON"
-                        };
-                        const isActive = activeSpecView === vt;
-                        return (
-                          <button
-                            key={vt}
-                            onClick={() => setActiveSpecView(vt)}
-                            className={`text-[9px] font-mono font-bold uppercase tracking-tighter transition-all ${isActive ? "text-cyan-400 border-b-2 border-cyan-400" : "text-slate-500 hover:text-slate-300"}`}
-                          >
-                            {vtLabels[vt]}
-                          </button>
-                        );
-                      })}
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-widest font-mono block mb-1">
+                        Rotate Microscope Aperture:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5 border-b border-slate-900 pb-2" id="spec-tabs">
+                        {(["financial", "industrial", "physics", "credibility", "geopolitical", "json"] as const).map((vt) => {
+                          const vtLabels: Record<string, string> = {
+                            financial: "💸 Financial",
+                            industrial: "🏭 Industrial",
+                            physics: "⚡ Physics",
+                            credibility: "🛡️ Credibility",
+                            geopolitical: "🌐 Geopolitical",
+                            json: "📄 Raw Schema"
+                          };
+                          const isActive = activeSpecView === vt;
+                          return (
+                            <button
+                              key={vt}
+                              onClick={() => setActiveSpecView(vt)}
+                              className={`px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-tight rounded border transition-all ${isActive ? "text-cyan-400 border-cyan-500/40 bg-cyan-950/20" : "text-slate-500 border-transparent hover:text-slate-300"}`}
+                            >
+                              {vtLabels[vt]}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     {/* Spec Tab Contents */}
                     <div className="min-h-[220px]">
-                      {activeSpecView === "columns" && (
-                        <div className="space-y-3">
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Under the canonical EvidenceFrame contract, all records must expose fixed primary columns for relational interoperability.
-                          </p>
-
-                          <div className="space-y-2 text-[10.5px] font-mono text-slate-300">
-                            <div className="bg-slate-900/60 p-2 rounded border border-slate-850">
-                              <span className="text-cyan-400 font-bold block">id</span>
-                              <p className="text-[10px] text-slate-500 leading-relaxed">Primary key. Unique hash or identifier (e.g., "{activeRow.id}").</p>
-                            </div>
-                            <div className="bg-slate-900/60 p-2 rounded border border-slate-850">
-                              <span className="text-cyan-400 font-bold block">subject_descriptor</span>
-                              <p className="text-[10px] text-slate-500 leading-relaxed">Common name assigned to vector element (e.g., "{activeRow.name}").</p>
-                            </div>
-                            <div className="bg-slate-900/60 p-2 rounded border border-slate-850">
-                              <span className="text-cyan-400 font-bold block">class_taxonomic</span>
-                              <p className="text-[10px] text-slate-500 leading-relaxed">Unified taxonomic category mapping (e.g., "{activeRow.classification}").</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {activeSpecView === "semantics" && (
-                        <div className="space-y-3">
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Every raw observation registers a pattern and potential contradiction, triggering the Delta Layer validation state automatically.
-                          </p>
-
-                          <div className="space-y-2 text-[10.5px] font-mono">
-                            <div className="bg-slate-900/60 p-2.5 rounded border border-slate-850 text-slate-300 leading-relaxed">
-                              <span className="text-purple-400 font-bold block text-[9px] uppercase tracking-wider">
-                                MAPPED EVIDENCE PATTERN:
+                      {activeSpecView !== "json" ? (() => {
+                        const cap = getApertureContent(activeRow.id, activeSpecView, activeRow);
+                        return (
+                          <div className="space-y-3 animate-fade-in">
+                            <div className="flex justify-between items-center bg-slate-900/60 p-2 rounded border border-slate-850">
+                              <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">
+                                🔍 {cap.title} Active
                               </span>
-                              "{activeRow.evidenceBindings.pattern}"
-                            </div>
-
-                            <div className="bg-slate-900/60 p-2.5 rounded border border-slate-850 text-slate-300 leading-relaxed">
-                              <span className="text-rose-400 font-bold block text-[9px] uppercase tracking-wider">
-                                CONTRADICTION TRIGGER (JEMMA PROBE):
+                              <span className="text-[9px] text-slate-500 font-mono">
+                                Lens Ref: {activeSpecView.toUpperCase()}_v1
                               </span>
-                              "{activeRow.evidenceBindings.contradicts}"
                             </div>
-                          </div>
-                        </div>
-                      )}
 
-                      {activeSpecView === "provenance" && (
-                        <div className="space-y-3">
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Observations represent the immutable raw source of truth behind high-dimensional vector representations.
-                          </p>
+                            <p className="text-[11px] text-slate-300 leading-relaxed font-sans bg-[#040811] p-2.5 rounded border border-slate-900">
+                              {cap.focus}
+                            </p>
 
-                          <div className="space-y-2">
-                            {activeRow.observations.map((obs, oIdx) => (
-                              <div key={oIdx} className="bg-slate-900/60 p-2.5 rounded border border-slate-850 text-xs text-slate-300 leading-relaxed">
-                                <span className="text-[9px] text-slate-500 font-mono uppercase block mb-1">
-                                  Observation Signal #{oIdx + 1}
-                                </span>
-                                {obs}
+                            <div className="space-y-1.5">
+                              <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block font-bold">
+                                Observational Constraints & Metrics:
+                              </span>
+                              <div className="grid grid-cols-2 gap-2 text-[10.5px] font-mono">
+                                {cap.metrics.map(([label, val]) => (
+                                  <div key={label} className="bg-slate-900/40 p-2 rounded border border-slate-900/80 flex flex-col justify-between">
+                                    <span className="text-[9px] text-slate-500 uppercase tracking-tight block">
+                                      {label}
+                                    </span>
+                                    <span className="text-[11px] text-white font-bold truncate">
+                                      {val}
+                                    </span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                            </div>
 
-                      {activeSpecView === "json" && (
-                        <div className="space-y-2">
+                            {activeSpecView === "credibility" && (
+                              <div className="space-y-1.5 mt-2">
+                                <span className="text-[9px] text-purple-400 font-mono uppercase block font-bold tracking-wider">
+                                  Ingested Evidence Provenance Chain:
+                                </span>
+                                <div className="space-y-1 max-h-[110px] overflow-y-auto pr-1">
+                                  {(activeRow.credibilityEvidence || [
+                                    "SEC filings and company registries check",
+                                    "Multi-source automatic corroboration scheduled",
+                                    "Hermes metadata routing verification pending",
+                                    "Red Team challenge active verification",
+                                    "Operator approval status logged"
+                                  ]).map((ev: string, evIdx: number) => (
+                                    <div key={evIdx} className="bg-slate-900/30 p-1.5 rounded border border-slate-900 text-[10.5px] flex items-start space-x-1.5">
+                                      <span className="text-purple-500 font-mono text-[9px] mt-0.5">[{evIdx + 1}]</span>
+                                      <span className="text-slate-300 font-sans leading-tight">{ev}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })() : (
+                        <div className="space-y-2 font-mono">
                           <p className="text-[11px] text-slate-400 leading-relaxed">
                             Canonical schema serialization format ready for Apache Arrow stream serialization.
                           </p>
